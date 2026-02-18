@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/animations.css">
     <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/reader.css">
+    <link rel="stylesheet" href="css/security.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- PDF.js for Library Access -->
     <script src="js/pdfjs/pdf.min.js"></script>
@@ -45,6 +47,9 @@
                 </button>
                 <button class="nav-item" data-tab="settings">
                     <i class="fas fa-cog"></i> <span>Account Settings</span>
+                </button>
+                <button class="nav-item hidden" data-tab="admin" id="sidebar-admin-btn">
+                    <i class="fas fa-user-shield"></i> <span>Admin Portal</span>
                 </button>
             </nav>
 
@@ -131,9 +136,16 @@
 
             <!-- MY LIBRARY TAB -->
             <section id="library" class="content-section">
-                <header class="content-header">
-                    <h1>My <span class="gold-text">Library</span></h1>
-                    <p>Your digital collection</p>
+                <header class="content-header"
+                    style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h1>My <span class="gold-text">Library</span></h1>
+                        <p>Your digital collection</p>
+                    </div>
+                    <button class="btn btn-gold small" onclick="syncLibraryWithBackend()"
+                        style="width: auto; padding: 0 15px;">
+                        <i class="fas fa-sync-alt"></i> Sync Library
+                    </button>
                 </header>
 
                 <div id="dashboard-library-list" class="items-grid">
@@ -220,13 +232,192 @@
                     </div>
                 </div>
             </section>
+
+            <!-- ADMIN PORTAL TAB -->
+            <section id="admin" class="content-section">
+                <header class="content-header">
+                    <h1>Admin <span class="gold-text">Portal</span></h1>
+                    <p>Management & Analytics Dashboard</p>
+                </header>
+
+                <div class="stats-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card glass-panel shine-hover">
+                        <div class="icon-box gold"><i class="fas fa-boxes"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Books</h3>
+                            <span id="admin-stat-total-products" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel shine-hover">
+                        <div class="icon-box blue"><i class="fas fa-shopping-bag"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Orders</h3>
+                            <span id="admin-stat-total-orders" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel shine-hover">
+                        <div class="icon-box green"><i class="fas fa-coins"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Revenue</h3>
+                            <span id="admin-stat-revenue" class="stat-value">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tabs" style="display: flex; gap: 15px; margin-bottom: 25px;">
+                    <button class="btn btn-gold small active" onclick="switchAdminTab('products')"
+                        id="btn-admin-products">Manage Products</button>
+                    <button class="btn btn-secondary small" onclick="switchAdminTab('orders')"
+                        id="btn-admin-orders">Manage Orders</button>
+                </div>
+
+                <!-- Products Catalog -->
+                <div id="admin-tab-products" class="admin-tab-content" style="display: block;">
+                    <div class="settings-card glass-panel" style="padding: 20px; overflow-x: auto;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h3 style="margin: 0;">Product Catalog</h3>
+                            <button class="btn btn-gold small" onclick="openAddProductModal()">+ Add Book</button>
+                        </div>
+                        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                    <th style="padding: 12px;">Image</th>
+                                    <th style="padding: 12px;">Title</th>
+                                    <th style="padding: 12px;">Type</th>
+                                    <th style="padding: 12px;">Price</th>
+                                    <th style="padding: 12px;">Stock</th>
+                                    <th style="padding: 12px;">Buyers</th>
+                                    <th style="padding: 12px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-product-table-body">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Admin Order Management -->
+                <div id="admin-tab-orders" class="admin-tab-content" style="display: none;">
+                    <div class="settings-card glass-panel" style="padding: 20px; overflow-x: auto;">
+                        <h3 style="margin-bottom: 20px;">Order Management</h3>
+                        <table style="width: 100%; border-collapse: collapse; min-width: 800px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                                    <th style="padding: 12px;">ID</th>
+                                    <th style="padding: 12px;">Customer</th>
+                                    <th style="padding: 12px;">Items</th>
+                                    <th style="padding: 12px;">Total</th>
+                                    <th style="padding: 12px;">Status</th>
+                                    <th style="padding: 12px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-order-table-body">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
         </main>
+    </div>
+
+    <!-- Product Management Modal -->
+    <div id="admin-product-modal" class="resume-modal-overlay" style="z-index: 100000; display: none;">
+        <div class="resume-modal glass-panel"
+            style="max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="admin-modal-title" style="margin: 0; font-size: 1.5rem; color: var(--gold-text);">Add New Book
+                </h2>
+                <button onclick="closeProductModal()"
+                    style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
+
+            <form id="admin-product-form">
+                <input type="hidden" id="admin-prod-id">
+
+                <div class="form-group">
+                    <label>Title</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-book"
+                            style="position: absolute; left: 15px; top: 15px; color: rgba(255,255,255,0.4);"></i>
+                        <input type="text" id="admin-prod-title" required
+                            style="padding-left: 45px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; width: 100%; height: 45px;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="admin-prod-type" onchange="toggleAdminFileFields()"
+                            style="width: 100%; height: 45px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; padding: 0 15px;">
+                            <option value="HARDCOVER">Hardcover</option>
+                            <option value="PAPERBACK">Paperback</option>
+                            <option value="EBOOK">E-book</option>
+                            <option value="AUDIOBOOK">Audiobook</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Language</label>
+                        <input type="text" id="admin-prod-lang" placeholder="English"
+                            style="width: 100%; height: 45px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; padding: 0 15px;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Price (₹)</label>
+                        <input type="number" id="admin-prod-price" required
+                            style="width: 100%; height: 45px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; padding: 0 15px;">
+                    </div>
+                    <div class="form-group">
+                        <label>Volume</label>
+                        <input type="number" id="admin-prod-volume" placeholder="1"
+                            style="width: 100%; height: 45px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; padding: 0 15px;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Description</label>
+                    <textarea id="admin-prod-desc" rows="3"
+                        style="width: 100%; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: white; padding: 10px 15px; resize: vertical;"></textarea>
+                </div>
+
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Cover Image</label>
+                    <input type="file" id="admin-file-cover" accept="image/*" style="width: 100%; color: white;">
+                    <p id="admin-current-cover" style="font-size: 0.8rem; color: #d4af37; margin-top: 5px;"></p>
+                </div>
+
+                <div id="admin-field-ebook" class="form-group" style="margin-top: 15px; display: none;">
+                    <label>E-book File</label>
+                    <input type="file" id="admin-file-ebook" accept=".pdf,.epub,.mobi,.doc,.docx,.txt,.rtf,.html"
+                        style="width: 100%; color: white;">
+                    <p id="admin-current-ebook" style="font-size: 0.8rem; color: #d4af37; margin-top: 5px;"></p>
+                </div>
+
+                <div id="admin-field-audio" class="form-group" style="margin-top: 15px; display: none;">
+                    <label>Audiobook File</label>
+                    <input type="file" id="admin-file-audio" accept="audio/*,video/*"
+                        style="width: 100%; color: white;">
+                    <p id="admin-current-audio" style="font-size: 0.8rem; color: #d4af37; margin-top: 5px;"></p>
+                </div>
+
+                <div style="margin-top: 30px; display: flex; gap: 15px;">
+                    <button type="submit" class="btn btn-gold full-width">Save Product</button>
+                    <button type="button" onclick="closeProductModal()"
+                        class="btn btn-secondary full-width">Cancel</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Scripts -->
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="js/api-config.js"></script>
     <script src="js/profile.js"></script>
+    <script src="js/security.js"></script>
     <!-- Use existing cart.js logic if needed for global functions, but profile.js will handle specific dashboard logic -->
 </body>
 

@@ -1,0 +1,132 @@
+/* Anti-Screenshot & Anti-Screen-Recording Security Layer Styles */
+
+#security-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, rgba(80, 0, 0, 0.98), rgba(0, 0, 0, 0.98));
+    z-index: 1000001;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #ff4d4d;
+    font-family: inherit;
+    text-align: center;
+    pointer-events: all;
+    backdrop-filter: blur(15px);
+    border-top: 8px solid #ff4d4d;
+    transition: all 0.3s ease;
+}
+
+#security-overlay h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 800;
+}
+
+#security-overlay p {
+    font-size: 1.2rem;
+    color: #ccc;
+    max-width: 600px;
+    margin-bottom: 2rem;
+}
+
+.security-meta {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px 25px;
+    border-radius: 10px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #aaa;
+    line-height: 1.6;
+}
+
+.security-blur {
+    filter: blur(40px) brightness(0.4) sepia(1) hue-rotate(-50deg) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+    transition: none !important;
+}
+
+.security-blur #security-shield {
+    display: block !important;
+    opacity: 1 !important;
+    pointer-events: all !important;
+    background: black !important;
+}
+
+.security-blur main,
+.security-blur header,
+.security-blur section,
+.security-blur nav,
+.security-blur footer,
+.security-blur .reader-overlay,
+.security-blur .product-modal-overlay {
+    filter: blur(100px) !important;
+    opacity: 0 !important;
+    display: none !important;
+}
+
+#security-shield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: black;
+    z-index: 1000000;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#security-watermark-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 999998;
+    overflow: hidden;
+}
+
+.watermark-item {
+    position: absolute;
+    transform: rotate(-30deg);
+    white-space: nowrap;
+    font-size: 12px;
+    font-weight: 900;
+    color: rgba(255, 211, 105, 0.15);
+    /* Gold watermark */
+    text-shadow: 1px 1px 0px rgba(0, 0, 0, 0.1);
+    pointer-events: none;
+    user-select: none;
+    transition: opacity 0.5s ease;
+}
+
+body.security-locked-blank {
+    background: #000 !important;
+}
+
+body.security-locked-blank>*:not(#security-overlay):not(#security-watermark-container) {
+    display: none !important;
+}
+
+/* Base protection for all elements when active */
+body.security-active {
+    user-select: none !important;
+    -webkit-user-select: none !important;
+}
+
+/* Prevent printing */
+@media print {
+    body {
+        display: none !important;
+    }
+}

@@ -1464,7 +1464,8 @@ body.modal-open>nav,
 body.modal-open>header,
 body.modal-open>section,
 body.modal-open>footer,
-body.modal-open>main {
+body.modal-open>main,
+body.modal-open>.dashboard-container {
     filter: brightness(0.4);
     pointer-events: none;
     transition: filter 0.4s ease;

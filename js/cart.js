@@ -41,11 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <h4 style="border-bottom: 1px solid rgba(255, 211, 105, 0.2); padding-bottom: 10px; margin-bottom: 15px;">Purchase History</h4>
             <div id="purchase-history-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
-                <!-- Mock Items -->
-                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.9rem;">EFV Volume 1</span>
-                    <span class="gold-text">₹499</span>
-                </div>
+                <p style="text-align: center; opacity: 0.5; font-size: 0.85rem; margin-top: 20px;">No purchase history found.</p>
             </div>
             <button class="btn btn-outline" id="logout-btn" style="width: 100%; margin-top: 20px;">Logout</button>
         </div>
@@ -184,27 +180,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sync library from backend to localStorage
     async function syncLibraryWithBackend() {
         const user = JSON.parse(localStorage.getItem('efv_user'));
-        if (!user || !user.email) return;
+        const token = localStorage.getItem('efv_token');
+        if (!user || !token) return;
 
         try {
-            const demoToken = btoa(user.email);
-            const response = await fetch('http://localhost:5000/api/demo/library', {
-                headers: { 'Authorization': `Bearer ${demoToken}` }
+            const response = await fetch('http://localhost:5000/api/library/my-library', {
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             const data = await response.json();
 
-            if (response.ok && data.library) {
+            if (response.ok) {
                 const libKey = getUserKey('efv_digital_library');
-                // Store in isolated localStorage
-                const localLibrary = data.library.map(prod => ({
-                    id: prod._id,
+                const localLibrary = data.map(prod => ({
+                    id: prod.productId || prod._id,
                     name: prod.title,
-                    type: prod.type === 'AUDIOBOOK' ? 'Audiobook' : 'E-Book',
-                    date: new Date().toLocaleDateString() // Mock date
+                    type: prod.type,
+                    thumbnail: prod.thumbnail,
+                    date: prod.purchasedAt ? new Date(prod.purchasedAt).toLocaleDateString() : new Date().toLocaleDateString()
                 }));
                 localStorage.setItem(libKey, JSON.stringify(localLibrary));
 
-                // Refresh UI components
                 updateLibraryDisplay();
                 updateMarketplaceButtons();
             }
@@ -274,6 +269,30 @@ document.addEventListener('DOMContentLoaded', () => {
             cartTotalDisplay.textContent = `₹${total.toFixed(2)}`;
         }
 
+        // --- AUTH STATE UI UPDATES ---
+        const user = JSON.parse(localStorage.getItem('efv_user'));
+        const authOptions = document.querySelector('.auth-options');
+        const checkoutBtn = document.getElementById('checkout-btn');
+        const userProfileView = document.getElementById('user-profile-view');
+
+        if (user) {
+            if (authOptions) authOptions.style.display = 'none';
+            if (checkoutBtn) checkoutBtn.style.display = 'block';
+
+            // Show Profile View in side-cart
+            if (userProfileView) {
+                userProfileView.style.display = 'block';
+                const nameDisplay = userProfileView.querySelector('h3');
+                const emailDisplay = userProfileView.querySelector('p');
+                if (nameDisplay) nameDisplay.textContent = user.name;
+                if (emailDisplay) emailDisplay.textContent = user.email;
+            }
+        } else {
+            if (authOptions) authOptions.style.display = 'flex';
+            if (checkoutBtn) checkoutBtn.style.display = 'none';
+            if (userProfileView) userProfileView.style.display = 'none';
+        }
+
         localStorage.setItem('efv_cart', JSON.stringify(cart));
 
         // Add Remove listeners
@@ -287,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Open Product Modal
-    function openProductModal(productId, card) {
+    window.openProductModal = function openProductModal(productId, card) {
         const modal = document.getElementById('product-detail-modal');
         const data = window.EFV_Products[productId] || {
             title: card.getAttribute('data-name'),
@@ -543,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Helper for actual cart addition logic
-    function processAddToCart(id, card, triggerModal = true, customQty = 1) {
+    function processAddToCart(id, card, triggerModal = true, customQty = 1, directCheckout = false) {
         if (triggerModal) {
             openProductModal(id, card);
             return;
@@ -556,60 +575,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const quantityToAdd = parseInt(customQty) || 1;
 
         if (isDigitalProduct) {
-            // Instant delivery: Add to library locally
-            const libKey = getUserKey('efv_digital_library');
-            let library = JSON.parse(localStorage.getItem(libKey)) || [];
+            // Digital products are added to library ONLY after successful payment
+            // (Removed instant demo addition to satisfy user requirement of "Purchase complete -> Auto add")
 
-            const alreadyOwned = library.some(l => l.id === id);
-
-            // Demo Mode: Always add to library locally for testing
-            if (!alreadyOwned) {
-                library.push({
-                    id: id,
-                    name: name,
-                    type: id.includes('audio') ? 'Audiobook' : 'E-Book',
-                    date: new Date().toLocaleDateString()
-                });
-                localStorage.setItem(libKey, JSON.stringify(library));
-
-                // Show ephemeral message for demo
-                const demoMsg = document.createElement('div');
-                Object.assign(demoMsg.style, {
-                    position: 'fixed',
-                    bottom: '20px',
-                    right: '20px',
-                    background: '#10b981',
-                    color: 'white',
-                    padding: '15px 25px',
-                    borderRadius: '8px',
-                    zIndex: '10000',
-                    boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
-                    fontWeight: 'bold',
-                    animation: 'fadeIn 0.5s ease-out'
-                });
-                demoMsg.innerHTML = '<i class="fas fa-check-circle"></i> Added to Library (Demo Access)';
-                document.body.appendChild(demoMsg);
-                setTimeout(() => demoMsg.remove(), 3000);
-
-                // Sync with Backend (Demo Account)
-                const user = JSON.parse(localStorage.getItem('efv_user'));
-                if (user && user.email) {
-                    const demoToken = btoa(user.email);
-                    fetch('http://localhost:5000/api/demo/add-to-library', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${demoToken}`
-                        },
-                        body: JSON.stringify({ productId: id })
-                    }).catch(err => console.error('❌ Backend Sync Failed:', err));
-                }
-            }
-
-            // Also add to cart for records (so they can see it in cart too)
+            // Add to cart
             const existingInCart = cart.find(item => item.id === id);
             if (!existingInCart) {
-                cart.push({ id, name, price, quantity: quantityToAdd });
+                cart.push({ id, name, price, quantity: quantityToAdd, type: id.includes('audio') ? 'AUDIOBOOK' : 'EBOOK' });
                 localStorage.setItem('efv_cart', JSON.stringify(cart));
             }
 
@@ -617,16 +589,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
             if (typeof updateMarketplaceButtons === 'function') updateMarketplaceButtons();
 
-            // Open Cart Panel to show it's added
-            toggleCart(true);
+            if (directCheckout) {
+                // Direct buy for digital products
+                checkoutOrder([{ id, name, price, quantity: quantityToAdd, type: id.includes('audio') ? 'AUDIOBOOK' : 'EBOOK' }]);
+            } else {
+                // Open Cart Panel
+                toggleCart(true);
+            }
         } else {
             // Physical
             const existing = cart.find(item => item.id === id);
             if (existing) {
                 existing.quantity += quantityToAdd;
             } else {
-                cart.push({ id, name, price, quantity: quantityToAdd });
+                cart.push({ id, name, price, quantity: quantityToAdd, type: 'PHYSICAL' });
             }
+            localStorage.setItem('efv_cart', JSON.stringify(cart));
             updateCartUI();
 
             // Show Standard Cart for physical (ensure profile is hidden)
@@ -646,8 +624,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const isDigital = id.includes('audio') || id.includes('ebook');
 
             if (isDigital) {
-                // Instant Access for Digital
-                processAddToCart(id, card, false);
+                // Instant Access for Digital - Direct Checkout
+                processAddToCart(id, card, false, 1, true);
             } else {
                 // Standard Flow for Physical
                 openProductModal(id, card);
@@ -795,24 +773,36 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 }
 
+                const imgUrl = item.thumbnail ? (item.thumbnail.startsWith('http') ? item.thumbnail : (window.API_BASE || 'http://localhost:5000') + (item.thumbnail.startsWith('/') ? '' : '/') + item.thumbnail) : 'img/placeholder.png';
+
                 return `
-                <div style="background: rgba(255, 211, 105, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 211, 105, 0.2); display: flex; flex-direction: column; gap: 4px;">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div style="flex: 1;">
-                            <span style="font-size: 0.9rem; font-weight: 600;">${item.name}${progressInfo}</span>
-                            <span style="display: block; font-size: 0.75rem; opacity: 0.6; margin-top: 4px;">
-                                 ${isPlaying ? (isPaused ? '<span style="color:var(--gold-energy);">⏸ Paused</span>' : '<span style="color:#10b981;">▶ Now Playing...</span>') : `${item.type} • Added ${item.date}`}
-                            </span>
-                            ${lastListenedText}
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center; margin-left: 10px;">
-                            <button onclick="window.accessContent('${item.type}', '${item.name.replace(/'/g, "\\'")}')" 
-                                    style="background: ${isPlaying ? (isPaused ? 'var(--gold-energy)' : '#ff6b6b') : 'var(--gold-energy)'}; color: black; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; transition: all 0.3s; min-width: 80px;">
-                                ${isAudio ? (isPlaying ? (isPaused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>') : '<i class="fas fa-play"></i> Listen') : (item.progress ? '<i class="fas fa-redo"></i> Resume' : '<i class="fas fa-book-open"></i> Read')}
-                            </button>
+                <div style="background: rgba(255, 211, 105, 0.05); padding: 15px; border-radius: 12px; border: 1px solid rgba(255, 211, 105, 0.1); display: flex; gap: 15px; align-items: center; transition: all 0.3s; margin-bottom: 10px;">
+                    <div style="width: 60px; height: 85px; flex-shrink: 0; position: relative;">
+                        <img src="${imgUrl}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                        <div style="position: absolute; top: -5px; right: -5px; width: 22px; height: 22px; background: var(--gold-energy); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: black; font-size: 0.7rem;">
+                            <i class="fas ${isAudio ? 'fa-headphones' : 'fa-book'}"></i>
                         </div>
                     </div>
-                    ${progressBar}
+                    <div style="flex: 1; min-width: 0;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div style="flex: 1; min-width: 0;">
+                                <h4 style="margin: 0; font-size: 1rem; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${item.name}</h4>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
+                                    <span style="font-size: 0.7rem; padding: 2px 6px; background: rgba(255,211,105,0.1); border: 1px solid rgba(255,211,105,0.2); border-radius: 4px; color: var(--gold-energy); text-transform: uppercase; font-weight: 700;">${item.type}</span>
+                                    <span style="font-size: 0.7rem; opacity: 0.5;">Purchased: ${item.date}</span>
+                                </div>
+                                ${progressInfo}
+                                ${lastListenedText}
+                            </div>
+                            <div style="margin-left: 10px;">
+                                <button onclick="window.accessContent('${item.type}', '${item.name.replace(/'/g, "\\'")}')" 
+                                        style="background: ${isPlaying ? (isPaused ? 'var(--gold-energy)' : '#ff6b6b') : 'var(--gold-energy)'}; color: black; border: none; padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; font-weight: 800; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                    ${isAudio ? (isPlaying ? (isPaused ? '<i class="fas fa-play"></i> RESUME' : '<i class="fas fa-pause"></i> PAUSE') : '<i class="fas fa-play"></i> LISTEN NOW') : (item.progress ? '<i class="fas fa-book-open"></i> RESUME READ' : '<i class="fas fa-book-open"></i> READ NOW')}
+                                </button>
+                            </div>
+                        </div>
+                        ${progressBar}
+                    </div>
                 </div>
             `}).join('');
         } else {
@@ -1606,6 +1596,79 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
         }
 
+        const isOnlyDigital = itemsToProcess.every(item => item.id.includes('audio') || item.id.includes('ebook'));
+
+        if (isOnlyDigital) {
+            // --- INSTANT ACCESS BYPASS FOR DIGITAL PRODUCTS ---
+            if (btn) btn.textContent = 'Granting Access...';
+
+            setTimeout(async () => {
+                try {
+                    // Direct Fulfillment logic skip Razorpay
+                    const purchasedItems = [...itemsToProcess];
+                    if (!itemsOverride) {
+                        cart = [];
+                        localStorage.setItem('efv_cart', JSON.stringify(cart));
+                        updateCartUI();
+                    }
+
+                    // Sync library with backend
+                    syncLibraryWithBackend().catch(err => console.error('Sync failed:', err));
+
+                    // Manual Library Update (Local & Demo DB)
+                    for (const item of purchasedItems) {
+                        const isDigital = item.id.includes('audio') || item.id.includes('ebook');
+                        if (isDigital) {
+                            const libKey = getUserKey('efv_digital_library');
+                            let currentLibrary = JSON.parse(localStorage.getItem(libKey)) || [];
+                            if (!currentLibrary.some(l => l.id === item.id)) {
+                                currentLibrary.push({
+                                    id: item.id,
+                                    name: item.name,
+                                    type: item.id.includes('audio') ? 'Audiobook' : 'E-Book',
+                                    date: new Date().toLocaleDateString()
+                                });
+                                localStorage.setItem(libKey, JSON.stringify(currentLibrary));
+
+                                const demoToken = btoa(user.email);
+                                await fetch('http://localhost:5000/api/demo/add-to-library', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'Authorization': `Bearer ${demoToken}`
+                                    },
+                                    body: JSON.stringify({ productId: item.id })
+                                }).catch(e => console.error('Library Sync Error:', e));
+                            }
+                        }
+
+                        const historyKey = getUserKey('efv_purchase_history');
+                        let currentHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
+                        const existing = currentHistory.find(h => h.name === item.name);
+                        if (existing) existing.quantity += item.quantity;
+                        else currentHistory.push({ name: item.name, price: item.price, quantity: item.quantity, date: new Date().toLocaleDateString() });
+                        localStorage.setItem(historyKey, JSON.stringify(currentHistory));
+                    }
+
+                    if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
+                    if (typeof updateHistoryDisplay === 'function') updateHistoryDisplay();
+
+                    alert('✅ Product added to your library instantly! Redirecting to Dashboard...');
+                    window.location.href = 'profile.html';
+
+                } catch (e) {
+                    console.error('Fast fulfillment error:', e);
+                    alert('Error granting access. Please try again.');
+                } finally {
+                    if (btn) {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }
+                }
+            }, 1000);
+            return;
+        }
+
         try {
             // Deactivate security shield during checkout to allow input and focus
             if (typeof deactivateSecurityShield === 'function') deactivateSecurityShield();
@@ -1695,9 +1758,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             toggleUserProfile(true);
                             toggleCart(true);
 
-                            if (window.location.protocol !== 'file:') {
-                                syncLibraryWithBackend().catch(err => console.error('Sync failed:', err));
-                            }
+                            // Sync library with backend
+                            syncLibraryWithBackend().catch(err => console.error('Sync failed:', err));
 
                             // Manual Library Update
                             purchasedItems.forEach(async (item) => {
@@ -1823,18 +1885,33 @@ document.addEventListener('DOMContentLoaded', () => {
             submitBtn.disabled = true;
 
             try {
-                // Admin Credentials Check (Client-side bypass for demo/admin)
+                // Admin Credentials Check (API Auth for real token)
                 if (email === 'admin@uwo24.com' && password === 'uwo@1234') {
-                    // ... (existing admin logic)
-                    sessionStorage.setItem('adminLoggedIn', 'true');
-                    localStorage.setItem('efv_user', JSON.stringify({ name: 'ADMIN', email: email }));
-                    // Admin might not need token for frontend demos, but if backend requires it, we should login via API too.
-                    // For now, keep legacy admin as is.
-                    if (window.updateAdminNavbar) window.updateAdminNavbar();
-                    closeAuth();
-                    toggleUserProfile(true);
-                    toggleCart(true);
-                    return;
+                    const adminRes = await fetch('http://localhost:5000/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+                    const adminData = await adminRes.json();
+
+                    if (adminRes.ok) {
+                        localStorage.setItem('efv_token', adminData.token);
+                        localStorage.setItem('efv_user', JSON.stringify({
+                            name: adminData.name,
+                            email: adminData.email,
+                            role: adminData.role,
+                            _id: adminData._id
+                        }));
+                        sessionStorage.setItem('adminLoggedIn', 'true');
+
+                        if (window.updateAdminNavbar) window.updateAdminNavbar();
+                        closeAuth();
+                        updateCartUI();
+                        toggleCart(true);
+                        return;
+                    } else {
+                        throw new Error(adminData.message || 'Admin login failed');
+                    }
                 }
 
                 // API Login
@@ -1860,7 +1937,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }));
 
                 closeAuth();
-                toggleUserProfile(true);
+                updateCartUI(); // Update UI to reflect login
                 toggleCart(true);
 
                 // Sync library
@@ -1920,7 +1997,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }));
 
                 closeAuth();
-                toggleUserProfile(true);
+                updateCartUI(); // Update UI to reflect signup
                 toggleCart(true);
 
                 // Sync library

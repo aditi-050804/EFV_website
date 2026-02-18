@@ -5,7 +5,7 @@
 
 const productMetadata = {
     // Volume 1
-    "efv_canon_v1_hard": {
+    "efv_v1_hardcover": {
         title: "EFV™ VOL 1: ORIGIN CODE™",
         edition: "Hardcover Edition",
         category: "Self-Help / Energy Science",
@@ -25,7 +25,7 @@ const productMetadata = {
         genericName: "Books",
         countryOfOrigin: "India"
     },
-    "efv_canon_v1_paper": {
+    "efv_v1_paperback": {
         title: "EFV™ VOL 1: ORIGIN CODE™",
         edition: "Paperback Edition",
         category: "Self-Help / Energy Science",
@@ -45,8 +45,36 @@ const productMetadata = {
         genericName: "Books",
         countryOfOrigin: "India"
     },
-    // Volume 2
-    "efv_canon_v2_hard": {
+    "efv_v1_audiobook": {
+        title: "EFV™ VOL 1: ORIGIN CODE™",
+        edition: "Audiobook Edition",
+        category: "Digital / Audiobook",
+        description: "The immersive audio experience of Volume 1. Listen and align with the frequencies of existence while on the go.",
+        specs: {
+            "Product Form": "Digital Audio",
+            "Format": "MP3 / Streaming",
+            "Language": "Hindi",
+            "Duration": "8h 45m"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    "efv_v1_ebook": {
+        title: "EFV™ VOL 1: ORIGIN CODE™",
+        edition: "E-Book Edition",
+        category: "Digital / E-Book",
+        description: "The complete digital version of Volume 1. Accessible on all your devices for convenient reading and study.",
+        specs: {
+            "Product Form": "Digital E-Book",
+            "Format": "PDF / Secure Viewer",
+            "Language": "Hindi",
+            "Pages": "320"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    // Volume 2 - Hindi
+    "efv_v2_hardcover": {
         title: "EFV™ VOL 2: MINDOS™",
         edition: "Hardcover Edition",
         category: "Consciousness / Psychology",
@@ -66,7 +94,7 @@ const productMetadata = {
         genericName: "Books",
         countryOfOrigin: "India"
     },
-    "efv_canon_v2_paper": {
+    "efv_v2_paperback": {
         title: "EFV™ VOL 2: MINDOS™",
         edition: "Paperback Edition",
         category: "Consciousness / Psychology",
@@ -84,6 +112,168 @@ const productMetadata = {
         packerName: "Repro Books Limited",
         packerAddress: "Repro Books Limited, Plot No. 50 to 54, TTC Industrial Area, Mahape, Navi Mumbai, Maharashtra - 400710",
         genericName: "Books",
+        countryOfOrigin: "India"
+    },
+    "efv_v2_audiobook": {
+        title: "EFV™ VOL 2: MINDOS™",
+        edition: "Audiobook Edition",
+        category: "Digital / Audiobook",
+        description: "The immersive audio experience of Volume 2. Decode the architecture of the human mind while on the go.",
+        specs: {
+            "Product Form": "Digital Audio",
+            "Format": "MP3 / Streaming",
+            "Language": "Hindi",
+            "Duration": "9h 30m"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    "efv_v2_ebook": {
+        title: "EFV™ VOL 2: MINDOS™",
+        edition: "E-Book Edition",
+        category: "Digital / E-Book",
+        description: "The complete digital version of Volume 2. Accessible on all your devices.",
+        specs: {
+            "Product Form": "Digital E-Book",
+            "Format": "PDF / Secure Viewer",
+            "Language": "Hindi",
+            "Pages": "350"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    // Volume 1 - English Editions
+    "efv_v1_hardcover_en": {
+        title: "EFV™ VOL 1: THE ORIGIN CODE™",
+        edition: "Hardcover Edition (English)",
+        category: "Self-Help / Energy Science",
+        description: "A journey into the starting point of everything — where consciousness, energy, and existence begin. The English edition of the foundational Volume 1.",
+        specs: {
+            "Product Form": "Hardcover",
+            "Language": "English",
+            "Dimensions": "6.0 x 9.0 inches",
+            "Weight": "0.45 kg",
+            "Pages": "320"
+        },
+        mfrName: "Notion Press",
+        mfrAddress: "No. 8, 3rd Cross Street, CIT Colony, Mylapore, Chennai, Tamil Nadu - 600004",
+        packerName: "Repro Books Limited",
+        packerAddress: "Repro Books Limited, Plot No. 50 to 54, TTC Industrial Area, Mahape, Navi Mumbai, Maharashtra - 400710",
+        genericName: "Books",
+        countryOfOrigin: "India"
+    },
+    "efv_v1_paperback_en": {
+        title: "EFV™ VOL 1: THE ORIGIN CODE™",
+        edition: "Paperback Edition (English)",
+        category: "Self-Help / Energy Science",
+        description: "Explore the secrets of Energy and Alignment in English. The easy-to-carry paperback format of the foundational Volume 1.",
+        specs: {
+            "Product Form": "Paperback",
+            "Language": "English",
+            "Dimensions": "5.5 x 8.5 inches",
+            "Weight": "0.32 kg",
+            "Pages": "320"
+        },
+        mfrName: "Notion Press",
+        mfrAddress: "No. 8, 3rd Cross Street, CIT Colony, Mylapore, Chennai, Tamil Nadu - 600004",
+        packerName: "Repro Books Limited",
+        packerAddress: "Repro Books Limited, Plot No. 50 to 54, TTC Industrial Area, Mahape, Navi Mumbai, Maharashtra - 400710",
+        genericName: "Books",
+        countryOfOrigin: "India"
+    },
+    "efv_v1_audiobook_en": {
+        title: "EFV™ VOL 1: THE ORIGIN CODE™",
+        edition: "Audiobook Edition (English)",
+        category: "Digital / Audiobook",
+        description: "The immersive English audio experience of Volume 1. Listen and align with the frequencies of existence.",
+        specs: {
+            "Product Form": "Digital Audio",
+            "Format": "MP3 / Streaming",
+            "Language": "English",
+            "Duration": "8h 45m"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    "efv_v1_ebook_en": {
+        title: "EFV™ VOL 1: THE ORIGIN CODE™",
+        edition: "E-Book Edition (English)",
+        category: "Digital / E-Book",
+        description: "The complete English digital version of Volume 1. Accessible on all your devices for convenient reading.",
+        specs: {
+            "Product Form": "Digital E-Book",
+            "Format": "PDF / Secure Viewer",
+            "Language": "English",
+            "Pages": "320"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    // Volume 2 - English Editions
+    "efv_v2_hardcover_en": {
+        title: "EFV™ VOL 2: MINDOS™",
+        edition: "Hardcover Edition (English)",
+        category: "Consciousness / Psychology",
+        description: "An exploration of how thoughts and emotions shape our inner world. The English hardcover edition of Volume 2.",
+        specs: {
+            "Product Form": "Hardcover",
+            "Language": "English",
+            "Dimensions": "6.0 x 9.0 inches",
+            "Weight": "0.48 kg",
+            "Pages": "350"
+        },
+        mfrName: "Notion Press",
+        mfrAddress: "No. 8, 3rd Cross Street, CIT Colony, Mylapore, Chennai, Tamil Nadu - 600004",
+        packerName: "Repro Books Limited",
+        packerAddress: "Repro Books Limited, Plot No. 50 to 54, TTC Industrial Area, Mahape, Navi Mumbai, Maharashtra - 400710",
+        genericName: "Books",
+        countryOfOrigin: "India"
+    },
+    "efv_v2_paperback_en": {
+        title: "EFV™ VOL 2: MINDOS™",
+        edition: "Paperback Edition (English)",
+        category: "Consciousness / Psychology",
+        description: "Decoding Thought, Emotion & The Architecture Of The Human Mind. The English paperback edition.",
+        specs: {
+            "Product Form": "Paperback",
+            "Language": "English",
+            "Dimensions": "5.5 x 8.5 inches",
+            "Weight": "0.35 kg",
+            "Pages": "350"
+        },
+        mfrName: "Notion Press",
+        mfrAddress: "No. 8, 3rd Cross Street, CIT Colony, Mylapore, Chennai, Tamil Nadu - 600004",
+        packerName: "Repro Books Limited",
+        packerAddress: "Repro Books Limited, Plot No. 50 to 54, TTC Industrial Area, Mahape, Navi Mumbai, Maharashtra - 400710",
+        genericName: "Books",
+        countryOfOrigin: "India"
+    },
+    "efv_v2_audiobook_en": {
+        title: "EFV™ VOL 2: MINDOS™",
+        edition: "Audiobook Edition (English)",
+        category: "Digital / Audiobook",
+        description: "The English audio experience of Volume 2. Decode the architecture of the human mind on the go.",
+        specs: {
+            "Product Form": "Digital Audio",
+            "Format": "MP3 / Streaming",
+            "Language": "English",
+            "Duration": "9h 30m"
+        },
+        genericName: "Digital Content",
+        countryOfOrigin: "India"
+    },
+    "efv_v2_ebook_en": {
+        title: "EFV™ VOL 2: MINDOS™",
+        edition: "E-Book Edition (English)",
+        category: "Digital / E-Book",
+        description: "The complete English digital version of Volume 2. Accessible on all your devices.",
+        specs: {
+            "Product Form": "Digital E-Book",
+            "Format": "PDF / Secure Viewer",
+            "Language": "English",
+            "Pages": "350"
+        },
+        genericName: "Digital Content",
         countryOfOrigin: "India"
     },
     // Volume 3

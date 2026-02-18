@@ -270,22 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initModal();
 
-    // Admin Navbar Visibility Logic
+    // Admin Navbar Visibility Logic - REMOVED as admin is now integrated in profile
     window.updateAdminNavbar = () => {
-        const userData = JSON.parse(localStorage.getItem('efv_user'));
-        const isAdmin = sessionStorage.getItem('adminLoggedIn') === 'true' ||
-            (userData && userData.email && userData.email.toLowerCase() === 'admin@uwo24.com');
-
         document.querySelectorAll('a[href="admin.html"]').forEach(link => {
-            const listItem = link.parentElement;
-            if (isAdmin) {
-                listItem.style.setProperty('display', 'block', 'important');
-                listItem.style.visibility = 'visible';
-                listItem.style.opacity = '1';
-                listItem.style.pointerEvents = 'auto';
-            } else {
-                listItem.style.setProperty('display', 'none', 'important');
-            }
+            link.parentElement.style.display = 'none';
         });
     };
 

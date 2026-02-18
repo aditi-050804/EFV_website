@@ -681,8 +681,15 @@ body.dashboard-body {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 20000;
-    opacity: 0;
+    z-index: 100000;
+    opacity: 1;
+    /* Default to visible for robustness */
+    display: none;
+    /* Hide by default */
+}
+
+.resume-modal-overlay.active {
+    display: flex !important;
     animation: fadeIn 0.4s forwards;
 }
 
