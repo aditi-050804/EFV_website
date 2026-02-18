@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Order | EFV</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .tracking-container {
+            max-width: 800px;
+            margin: 150px auto 50px;
+            padding: 20px;
+        }
+
+        .tracking-box {
+            background: rgba(16, 20, 24, 0.8);
+            border: 1px solid rgba(255, 211, 105, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .tracking-input {
+            width: 70%;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 211, 105, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .timeline {
+            margin-top: 50px;
+            position: relative;
+            text-align: left;
+            padding-left: 20px;
+            display: none;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 29px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255, 211, 105, 0.3);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 30px;
+            padding-left: 60px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            width: 20px;
+            height: 20px;
+            background: #0f172a;
+            border: 2px solid var(--gold-energy);
+            border-radius: 50%;
+            z-index: 2;
+        }
+
+        .timeline-item.active .timeline-dot {
+            background: var(--gold-energy);
+            box-shadow: 0 0 10px var(--gold-energy);
+        }
+
+        .timeline-date {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .timeline-status {
+            font-size: 1.2rem;
+            color: white;
+            font-weight: bold;
+        }
+
+        .timeline-note {
+            font-size: 0.9rem;
+            color: #ccc;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">
+            <img src="assets/images/logo.png" alt="EFV Logo" class="logo-img">
+            <span class="logo-text">EFV</span><sup>TM</sup>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="marketplace.html">Marketplace</a></li>
+        </ul>
+    </nav>
+
+    <div class="container tracking-container">
+        <div class="tracking-box slide-blur-in">
+            <h1 style="font-family: 'Cinzel', serif; color: var(--gold-energy); margin-bottom: 20px;">Track Your Package
+            </h1>
+            <p style="margin-bottom: 30px; opacity: 0.8;">Enter your Order ID to see real-time status updates.</p>
+
+            <form id="tracking-form" style="display: flex; justify-content: center;">
+                <input type="text" id="order-id-input" class="tracking-input" placeholder="e.g. ORD-123456" required>
+                <button type="submit" class="btn btn-gold">Track</button>
+            </form>
+
+            <div id="loading" style="display: none; margin-top: 30px; color: var(--gold-energy);">
+                <i class="fas fa-circle-notch fa-spin" style="font-size: 2rem;"></i>
+            </div>
+
+            <div id="error-msg" style="display: none; margin-top: 20px; color: #ff4d4d;"></div>
+
+            <div id="timeline-view" class="timeline">
+                <!-- Timeline Items -->
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-bottom">
+                &copy; UWO<sup>TM</sup> — EFV<sup>TM</sup> Logistics | <a href="Feedback.html"
+                    style="color: inherit; text-decoration: none; opacity: 0.7;">Feedback</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const form = document.getElementById('tracking-form');
+        const input = document.getElementById('order-id-input');
+        const timelineView = document.getElementById('timeline-view');
+        const errorMsg = document.getElementById('error-msg');
+        const loading = document.getElementById('loading');
+
+        // Check URL params
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderIdParam = urlParams.get('id');
+        if (orderIdParam) {
+            input.value = orderIdParam;
+            trackOrder(orderIdParam);
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            trackOrder(input.value.trim());
+        });
+
+        async function trackOrder(orderId) {
+            loading.style.display = 'block';
+            timelineView.style.display = 'none';
+            errorMsg.style.display = 'none';
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/orders/track/${orderId}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderTimeline(data.timeline);
+                } else {
+                    throw new Error(data.message || 'Order not found');
+                }
+            } catch (error) {
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = 'block';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        function renderTimeline(timeline) {
+            timelineView.innerHTML = '';
+            // Sort timeline: newest first
+            const sortedEvents = timeline.slice().reverse();
+
+            sortedEvents.forEach((event, index) => {
+                const date = new Date(event.timestamp).toLocaleString();
+                const isActive = index === 0;
+
+                const html = `
+                    <div class="timeline-item ${isActive ? 'active' : ''}">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-date">${date}</div>
+                        <div class="timeline-status" style="${isActive ? 'color: var(--gold-energy);' : ''}">${event.status}</div>
+                        <div class="timeline-note">${event.note}</div>
+                    </div>
+                `;
+                timelineView.insertAdjacentHTML('beforeend', html);
+            });
+
+            timelineView.style.display = 'block';
+        }
+    </script>
+</body>
+
+</html>

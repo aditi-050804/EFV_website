@@ -1,0 +1,382 @@
+/* EFV Responsive Adjustments - Performance Optimized */
+
+/* Global Breakpoints */
+:root {
+    --nav-height: 80px;
+}
+
+/* Hide Hamburger by default (Desktop) */
+.hamburger {
+    display: none;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    padding: 8px 4px;
+    margin: 0 !important;
+    width: 40px;
+    height: 40px;
+    position: relative;
+    z-index: 2001;
+}
+
+/* Tablets & Small Desktops (1024px) */
+@media (max-width: 1024px) {
+    .container {
+        padding: 0 30px;
+    }
+
+    .sacred-circle {
+        width: 400px;
+        height: 400px;
+    }
+
+    h1 {
+        font-size: clamp(2.5rem, 10vw, 5rem) !important;
+    }
+}
+
+/* Small Tablets (992px) */
+@media (max-width: 992px) {
+    .nav-links {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 75%;
+        height: 100vh;
+        background: rgba(3, 5, 9, 0.99);
+        flex-direction: column;
+        z-index: 2000;
+        border-left: 1px solid var(--glass-border);
+    }
+
+    .nav-links.active {
+        right: 0;
+    }
+
+    .hamburger {
+        display: block !important;
+        position: relative;
+        z-index: 10000 !important;
+    }
+
+    /* Force visibility of hamburger spans */
+    .hamburger span {
+        background: var(--gold-energy) !important;
+        opacity: 1 !important;
+    }
+
+    nav {
+        padding: 5px 0 !important;
+        height: auto !important;
+        min-height: 70px;
+        display: flex;
+        align-items: center;
+    }
+
+    nav .container {
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        padding: 0 15px !important;
+    }
+
+    .logo,
+    .nav-actions {
+        flex-shrink: 0 !important;
+    }
+
+    .nav-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        margin-right: 0 !important;
+        gap: 12px !important;
+    }
+
+    .nav-actions .cart-icon {
+        padding: 6px 14px !important;
+        border-radius: 50px !important;
+        /* Pill shape */
+        background: rgba(13, 17, 23, 0.8) !important;
+        border: 1px solid var(--gold-energy) !important;
+        font-size: 0.9rem !important;
+    }
+
+    .section {
+        padding: 50px 0;
+    }
+
+    /* Footer Responsive */
+    .footer-content {
+        grid-template-columns: 1fr !important;
+        text-align: center !important;
+        gap: 50px !important;
+    }
+
+    .footer-explore h4,
+    .footer-explore h4::after,
+    .footer-connect h4,
+    .footer-connect h4::after {
+        text-align: center !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+    }
+
+    .footer-explore ul {
+        justify-items: center !important;
+        text-align: center !important;
+    }
+
+    .social-icons {
+        justify-content: center !important;
+    }
+
+    .footer-info {
+        order: -1 !important;
+        /* Keep logo at top on mobile */
+    }
+}
+
+/* Small Device Breakpoint (768px) */
+@media (max-width: 768px) {
+    :root {
+        --section-padding: 60px;
+    }
+
+    .section {
+        padding: var(--section-padding) 0;
+    }
+
+    .hero {
+        padding: 110px 0 50px;
+    }
+
+    /* Standard Grid logic - allow 2 columns for smaller items */
+    .grid-4,
+    .grid-3 {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+        gap: 20px !important;
+    }
+
+    .grid-2 {
+        grid-template-columns: 1fr !important;
+        gap: 30px !important;
+    }
+
+    /* Card sizing constraints to prevent huge cards */
+    .glass-panel {
+        padding: 20px;
+        max-width: 400px;
+        /* Constrain card width */
+        margin: 0 auto;
+        /* Center cards */
+        width: 100%;
+    }
+
+    .product-card,
+    .book-cover,
+    .testimonial-card {
+        max-width: 320px;
+        /* Specific limit for cards */
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Reset Flex Layouts - Safer selector */
+    section [style*="display: flex"]:not(.nav-actions):not(.footer-logo):not(.logo):not(.social-icons) {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+    }
+
+    /* Stacking Order: Text on Top, Logo on Bottom for Branding Sections */
+    .branding-section {
+        gap: 20px !important;
+        /* Reduced from 30px */
+    }
+
+    .branding-text {
+        order: -1 !important;
+    }
+
+    .branding-logo {
+        order: 1 !important;
+    }
+
+    .branding-logo img {
+        margin-top: -30px !important;
+        /* Pull image significantly closer */
+        max-width: 300px !important;
+    }
+
+    .grid-2 .reveal[style*="text-align: left"],
+    .branding-text {
+        padding-left: 0 !important;
+        text-align: center !important;
+    }
+
+    .branding-text ul {
+        margin-bottom: 0 !important;
+        /* Strip default list margin */
+    }
+
+    .nav-actions {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        margin-right: 0 !important;
+        gap: 8px !important;
+        /* Reduced gap */
+    }
+
+    .nav-actions .cart-icon {
+        padding: 6px 10px !important;
+        /* Smaller cart for mobile */
+        font-size: 0.9rem;
+    }
+
+    .hero-btns {
+        flex-direction: column !important;
+        width: 100%;
+        gap: 15px !important;
+    }
+
+    .btn {
+        width: 100%;
+        max-width: 350px;
+    }
+
+    .logo img {
+        height: 45px !important;
+    }
+
+    .logo {
+        align-items: center !important;
+        /* Center the stack: Icon above Text */
+        text-align: center !important;
+        gap: 2px !important;
+    }
+
+    .hamburger {
+        display: block !important;
+    }
+}
+
+/* Extra Small Devices (480px) */
+@media (max-width: 480px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .logo span {
+        font-size: 0.65rem;
+    }
+
+    .hero-content h1 {
+        font-size: clamp(2rem, 12vw, 3.5rem) !important;
+    }
+
+    .section h2 {
+        font-size: 1.6rem !important;
+    }
+
+    .glass-panel h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Force 1 column for very small screens if min-width is too high */
+    .grid-4,
+    .grid-3 {
+        grid-template-columns: 1fr !important;
+    }
+
+    .product-card,
+    .book-card,
+    .testimonial-card {
+        max-width: 100%;
+    }
+
+    /* Footer Responsive XS */
+    .footer-links ul {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+
+    .footer-info,
+    .footer-links,
+    .footer-connect {
+        max-width: 100% !important;
+        margin-bottom: 20px;
+    }
+
+    .footer-logo {
+        margin-bottom: 15px !important;
+    }
+
+    .social-icons {
+        justify-content: center !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+    }
+
+    .social-icon-link {
+        padding: 6px !important;
+    }
+
+    .social-icon-link img {
+        width: 24px !important;
+        height: 24px !important;
+    }
+
+    /* Header scaling fix */
+    header.section {
+        padding-top: 100px !important;
+        padding-bottom: 30px !important;
+    }
+
+    /* Carousel Nav repositioning */
+    .carousel-container {
+        padding: 0 10px;
+    }
+
+    .carousel-nav {
+        width: 40px;
+        height: 40px;
+    }
+
+    .carousel-nav.prev {
+        left: -5px;
+    }
+
+    .carousel-nav.next {
+        right: -5px;
+    }
+}
+
+/* Hamburger Menu CSS (Handled globally above) */
+
+.hamburger span {
+    display: block;
+    width: 28px;
+    height: 3px;
+    margin: 5px 0;
+    background: var(--gold-energy);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 0 12px rgba(255, 211, 105, 0.6);
+    border-radius: 2px;
+}
+
+.hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}

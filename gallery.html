@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery | EFV™ – Energy Frequency Vibration</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-auto-rows: min-content;
+            gap: 25px;
+            padding: 10px 0;
+        }
+
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 20px;
+            cursor: pointer;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            grid-column: span 4;
+            height: 400px;
+            /* Fixed height for uniformity */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bg blur effect layer */
+        .gallery-item-bg {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            filter: blur(20px) brightness(0.6);
+            transform: scale(1.2);
+            /* Remove white edges from blur */
+            z-index: 0;
+        }
+
+        .gallery-item img,
+        .gallery-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            /* No cropping */
+            position: relative;
+            z-index: 1;
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold-energy);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            z-index: 10;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(3, 5, 9, 0.9), transparent 70%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 20px;
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 2;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item h4 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-energy);
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            transform: translateY(20px);
+            transition: transform 0.4s ease;
+        }
+
+        .gallery-item:hover h4 {
+            transform: translateY(0);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 992px) {
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+                grid-auto-rows: auto;
+            }
+
+            .gallery-item {
+                grid-column: span 1 !important;
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .gallery-grid {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+
+            .gallery-item {
+                height: 350px;
+            }
+        }
+
+        /* Lightbox */
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(3, 5, 9, 0.98);
+            backdrop-filter: blur(20px);
+            z-index: 20000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        #lightbox.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        #lightbox-content {
+            max-width: 90%;
+            max-height: 85vh;
+            border-radius: 20px;
+            box-shadow: 0 0 100px rgba(255, 211, 105, 0.2);
+            border: 1px solid var(--gold-energy);
+            animation: lightBoxPop 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes lightBoxPop {
+            from {
+                transform: scale(0.9) translateY(20px);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close-lightbox {
+            position: absolute;
+            top: 30px;
+            right: 40px;
+            color: var(--gold-energy);
+            font-size: 3rem;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .close-lightbox:hover {
+            transform: rotate(90deg) scale(1.2);
+        }
+    </style>
+</head>
+
+<body data-page="gallery">
+    <div id="particles-js"></div>
+
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="img/AISA.svg" alt="AISA Logo">
+                <span>EFV<sup>TM</sup></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="gallery.html" class="active gold-text">Gallery</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="Feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="javascript:void(0)" id="cart-toggle" class="cart-icon glass-panel"
+                    style="padding: 10px 15px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shopping-cart gold-text"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <button class="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="section text-center"
+        style="padding-top: 200px; padding-bottom: 40px; position: relative; overflow: hidden;">
+        <div class="hex-grid-anim"></div>
+        <div class="container reveal active">
+            <h1 class="gradient-wipe letter-expand" style="font-size: clamp(2.5rem, 6vw, 4.5rem);">EFV<sup>TM</sup>
+                World</h1>
+            <p class="delay-1" style="color: rgba(248, 249, 250, 0.8); font-size: 1.1rem; margin-top: 20px;">See how
+                Energy, Frequency, and Vibration make our world beautiful.</p>
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <div class="gallery-grid">
+                <!-- Gallery items with new atmospheric assets -->
+                <div class="gallery-item reveal" data-type="image" data-src="img/38 (1).svg">
+                    <img src="img/38 (1).svg" alt="Atmospheric Calibration" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h4>Calming Aura</h4>
+                        <i class="fas fa-expand gold-text"></i>
+                    </div>
+                </div>
+
+                <div class="gallery-item reveal delay-1" data-type="image" data-src="img/37 (1).svg">
+                    <img src="img/37 (1).svg" alt="Frequency Pulse" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h4>Energy Wave</h4>
+                        <i class="fas fa-expand gold-text"></i>
+                    </div>
+                </div>
+
+                <div class="gallery-item reveal delay-2" data-type="image" data-src="img/39 (1).svg">
+                    <img src="img/39 (1).svg" alt="Cosmic Resonance" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h4>Perfect Balance</h4>
+                        <i class="fas fa-expand gold-text"></i>
+                    </div>
+                </div>
+
+                <div class="gallery-item reveal delay-3" data-type="image" data-src="img/40 (1).svg">
+                    <img src="img/40 (1).svg" alt="Digital Singularity" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h4>UWO Origin</h4>
+                        <i class="fas fa-expand gold-text"></i>
+                    </div>
+                </div>
+
+                <div class="gallery-item reveal delay-4" data-type="image" data-src="img/41 (1).svg">
+                    <img src="img/41 (1).svg" alt="Alignment Field" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h4>World Harmony</h4>
+                        <i class="fas fa-expand gold-text"></i>
+                    </div>
+                </div>
+
+                <div class="gallery-item reveal delay-5" data-type="image" data-src="img/42 (2).svg">
+                    <img src="img/42 (2).svg" alt="Energy Flow" loading="lazy">
+                    <div class="gallery-overlay">
+                        <h4>Energy Flow</h4>
+                        <i class="fas fa-expand gold-text"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox -->
+    <div id="lightbox">
+        <div class="close-lightbox">&times;</div>
+        <img id="lightbox-content" src="" alt="">
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="logo footer-logo">
+                        <img src="img/AISA.svg" alt="AISA Logo">
+                        <span>EFV<sup>TM</sup></span>
+                    </div>
+                    <p>World's first EFV<sup>TM</sup> system. Designed for better living.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="about.html">About EFV<sup>TM</sup></a></li>
+                        <li style="width: 100%;"><a href="uwo.html">About UWO<sup>TM</sup></a></li>
+                        <li style="width: 100%;"><a href="gallery.html">Gallery</a></li>
+                        <li style="width: 100%;"><a href="marketplace.html">Marketplace</a></li>
+                        <li style="width: 100%;"><a href="Feedback.html">Feedback</a></li>
+                        <li style="width: 100%;"><a href="contact.html">Contact</a></li>
+                        <li style="width: 100%;"><a href="privacy-policy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61585343488735" class="social-icon-link"
+                            aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <img src="img/FB.svg" alt="Facebook" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.instagram.com/efv_framework/" class="social-icon-link"
+                            aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Insta (1).svg" alt="Instagram" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.linkedin.com/in/efv-framework/" class="social-icon-link"
+                            aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Linkedin.svg" alt="LinkedIn" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.threads.com/@efv_framework" class="social-icon-link" aria-label="Threads"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/Threads.svg" alt="Threads" style="width: 32px; height: 32px;">
+                        </a>
+                        <!-- <a href="#" class="social-icon-link" aria-label="WhatsApp">
+                            <img src="img/Whatsapp.svg" alt="WhatsApp" style="width: 32px; height: 32px;">
+                        </a> -->
+                        <a href="https://x.com/EfvFrame_work" class="social-icon-link" aria-label="X (Twitter)"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/x.png" alt="X (Twitter)"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;"
+                                loading="lazy">
+                        </a>
+                        <a href="#" class="social-icon-link" aria-label="YouTube" target="_blank"
+                            rel="noopener noreferrer">
+                            <img src="img/YT (1).svg" alt="YouTube" style="width: 32px; height: 32px;" loading="lazy">
+                        </a>
+                        <a href="https://in.pinterest.com/EFV_Framework/" class="social-icon-link"
+                            aria-label="Pinterest" target="_blank" rel="noopener noreferrer">
+                            <img src="img/pinterset.png" alt="Pinterest" style="width: 26px; height: 26px;">
+                        </a>
+                        <a href="mailto:admin@uwo24.com" class="social-icon-link" aria-label="Gmail">
+                            <img src="img/gmail.png" alt="Gmail" style="width: 26px; height: 26px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; UWO<sup>TM</sup> — EFV<sup>TM</sup> is a UWO<sup>TM</sup> Innovation.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/particles.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/gallery.js"></script>
+    <script src="js/cart.js?v=9.0"></script>
+    <script src="js/chatbot.js?v=9.0"></script>
+</body>
+
+</html>

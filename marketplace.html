@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace | EFV™ – Energy Frequency Vibration</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="css/product-modal.css?v=13.0">
+
+    <!-- PDF.js Library for Secure In-App Viewer (Local) -->
+    <script src="js/pdfjs/pdf.min.js"></script>
+    <script src="js/efv-pdf-data.js"></script> <!-- Base64 PDF Data for File Protocol Support -->
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style id="anti-blur-override">
+        /* Nuclear Fix: Force clear modal blur regardless of external CSS state */
+        .product-modal-card,
+        .product-modal-card *,
+        .product-modal-overlay,
+        .tc-card,
+        .tc-card *,
+        .tc-modal-overlay {
+            filter: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            transform: perspective(1px) scale(1) translateY(0) !important;
+            image-rendering: -webkit-optimize-contrast !important;
+            image-rendering: crisp-edges !important;
+        }
+
+        body.modal-open {
+            filter: none !important;
+            backdrop-filter: none !important;
+        }
+
+        body.modal-open>nav,
+        body.modal-open>header,
+        body.modal-open>section {
+            filter: brightness(0.5) !important;
+            pointer-events: none !important;
+        }
+
+        /* Force Razorpay to be interactive */
+        .razorpay-backdrop,
+        .razorpay-checkout-frame {
+            pointer-events: auto !important;
+            filter: none !important;
+            z-index: 2000000000 !important;
+        }
+    </style>
+    <style>
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            justify-content: center;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            text-align: center;
+            max-width: 450px;
+            /* Increased to match grid */
+            margin: 0 auto;
+        }
+
+        .product-img {
+            height: 220px;
+            background: var(--deep-space);
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 211, 105, 0.1);
+            transition: var(--transition);
+        }
+
+        .product-card:hover .product-img {
+            border-color: var(--gold-energy);
+            transform: translateY(-5px);
+        }
+
+        .price {
+            display: block;
+            font-size: 1.2rem;
+            color: var(--gold-energy);
+            margin: 10px 0;
+            font-weight: 700;
+        }
+
+        /* Centered Cart Modal (Global in style.css) */
+        #cart-panel.active {
+            /* Handled by style.css */
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid rgba(255, 211, 105, 0.2);
+            padding-bottom: 20px;
+        }
+
+        .cart-items {
+            height: 60%;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .cart-item-info h4 {
+            font-size: 0.9rem;
+        }
+
+        .cart-total {
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 211, 105, 0.2);
+            padding-top: 20px;
+        }
+
+        .close-cart {
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+
+<body data-page="marketplace">
+    <div id="particles-js"></div>
+
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="img/AISA.svg" alt="AISA Logo">
+                <span>EFV<sup>TM</sup></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="marketplace.html" class="active gold-text">Marketplace</a></li>
+                <li><a href="Feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="javascript:void(0)" id="cart-toggle" class="cart-icon glass-panel"
+                    style="padding: 10px 15px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shopping-cart gold-text"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <button class="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="section text-center"
+        style="padding-top: 180px; padding-bottom: 40px; position: relative; overflow: hidden;">
+        <div class="vortex-container">
+            <div class="vortex-ring"></div>
+            <div class="vortex-ring"></div>
+            <div class="vortex-ring"></div>
+        </div>
+        <div class="container reveal active">
+            <h1 class="gradient-wipe glow-pulse-text"
+                style="font-size: clamp(2.5rem, 6vw, 4.5rem); margin-bottom: 10px;">
+                EFV<sup>TM</sup> Shop
+            </h1>
+            <p class="delay-1" style="color: rgba(248, 249, 250, 0.9); font-size: 1.1rem; margin-top: 20px;">Everything
+                you need to improve your energy and lifestyle.</p>
+        </div>
+    </header>
+
+    <section class="section" style="padding-top: 20px;">
+        <div class="container">
+            <div class="product-grid">
+                <!-- Hardcover Product: EFV Canon Volume 1 -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_hard"
+                    data-name="EFV TM VOL 1: The Origin Code (Hardcover)" data-price="499">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: var(--gold-energy); color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Hardcover</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 Hardcover" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Hardcover
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 70px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Learn the secrets of Energy and Alignment.</span>
+                        <span>Premium hardcover book.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">₹499.00</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold add-to-cart"
+                            style="width: auto; padding: 12px 30px; margin: 0 auto;">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Paperback Product: EFV Canon Volume 1 -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_paper"
+                    data-name="EFV TM VOL 1: The Origin Code (Paperback)" data-price="298">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #fff; color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Paperback</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 Paperback" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span
+                            style="color: rgba(255,255,255,0.7); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Paperback
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 70px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Learn the secrets of Energy and Alignment.</span>
+                        <span>Easy-to-carry paperback book.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">₹298.00</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold add-to-cart"
+                            style="width: auto; padding: 12px 30px; margin: 0 auto;">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Audiobook Product: EFV Canon Volume 1 -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_audio"
+                    data-name="EFV TM VOL 1: The Origin Code (Audiobook)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #ff6b35; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Audiobook</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 Audiobook" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span style="color: #ff6b35; font-size: 0.9rem; display: block; margin-bottom: 10px;">(Audiobook
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Listen and learn on the go.</span>
+                        <span>High-quality audio version.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">₹199.00</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold add-to-cart"
+                            style="width: auto; padding: 12px 30px; margin: 0 auto;">Purchase Now</button>
+                    </div>
+                </div>
+
+                <!-- E-book Product: EFV Canon Volume 1 -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_ebook"
+                    data-name="EFV TM VOL 1: The Origin Code (E-book)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #4ecdc4; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">E-book</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 E-book" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span style="color: #4ecdc4; font-size: 0.9rem; display: block; margin-bottom: 10px;">(E-book
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Read anytime, anywhere on your digital devices.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">₹149.00</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold add-to-cart"
+                            style="width: auto; padding: 12px 30px; margin: 0 auto;">Purchase Now</button>
+                    </div>
+                </div>
+
+                <!-- ENGLISH EDITION ROW -->
+
+                <!-- Hardcover Product: EFV Canon Volume 1 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_hard_en"
+                    data-name="EFV TM VOL 1: The Origin Code (English Hardcover)" data-price="499">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: var(--gold-energy); color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Hardcover</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 Hardcover" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Hardcover
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 70px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Learn the secrets of Energy and Alignment.</span>
+                        <span>Premium hardcover book.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">₹499.00</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold add-to-cart"
+                            style="width: auto; padding: 12px 30px; margin: 0 auto;">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Paperback Product: EFV Canon Volume 1 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_paper_en"
+                    data-name="EFV TM VOL 1: The Origin Code (English Paperback)" data-price="298">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #fff; color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Paperback</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 Paperback" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span
+                            style="color: rgba(255,255,255,0.7); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Paperback
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 70px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Learn the secrets of Energy and Alignment.</span>
+                        <span>Easy-to-carry paperback book.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">₹298.00</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold add-to-cart"
+                            style="width: auto; padding: 12px 30px; margin: 0 auto;">Add to Cart</button>
+                    </div>
+                </div>
+
+                <!-- Audiobook Product: EFV Canon Volume 1 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_audio_en"
+                    data-name="EFV TM VOL 1: The Origin Code (English Audiobook)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #ff6b35; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Audiobook</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 Audiobook" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span style="color: #ff6b35; font-size: 0.9rem; display: block; margin-bottom: 10px;">(Audiobook
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Listen and learn on the go.</span>
+                        <span>High-quality audio version.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- E-book Product: EFV Canon Volume 1 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v1_ebook_en"
+                    data-name="EFV TM VOL 1: The Origin Code (English E-book)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #4ecdc4; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">E-book</span>
+                        <img src="img/vol1-cover.png" alt="EFV Canon Volume 1 E-book" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 1: THE ORIGIN<br>CODE&trade;
+                        </h3>
+                        <span style="color: #4ecdc4; font-size: 0.9rem; display: block; margin-bottom: 10px;">(E-book
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Read anytime, anywhere on your digital devices.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- VOLUME 2: HINDI EDITION ROW -->
+
+                <!-- Hardcover Product: EFV Canon Volume 2 (Hindi) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_hard"
+                    data-name="EFV TM VOL 2: MINDOS (Hindi Hardcover)" data-price="499">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: var(--gold-energy); color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Hardcover</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2 hard" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Hardcover
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- Paperback Product: EFV Canon Volume 2 (Hindi) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_paper"
+                    data-name="EFV TM VOL 2: MINDOS (Hindi Paperback)" data-price="298">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #fff; color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Paperback</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span
+                            style="color: rgba(255,255,255,0.7); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Paperback
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- Audiobook Product: EFV Canon Volume 2 (Hindi) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_audio"
+                    data-name="EFV TM VOL 2: MINDOS (Hindi Audiobook)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #ff6b35; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Audiobook</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2 Audiobook" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span style="color: #ff6b35; font-size: 0.9rem; display: block; margin-bottom: 10px;">(Audiobook
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- E-book Product: EFV Canon Volume 2 (Hindi) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_ebook"
+                    data-name="EFV TM VOL 2: MINDOS (Hindi E-book)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #4ecdc4; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">E-book</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2 E-book" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span style="color: #4ecdc4; font-size: 0.9rem; display: block; margin-bottom: 10px;">(E-book
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">Hindi
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- VOLUME 2: ENGLISH EDITION ROW -->
+
+                <!-- Hardcover Product: EFV Canon Volume 2 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_hard_en"
+                    data-name="EFV TM VOL 2: MINDOS (English Hardcover)" data-price="499">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: var(--gold-energy); color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Hardcover</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2 hard" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Hardcover
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- Paperback Product: EFV Canon Volume 2 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_paper_en"
+                    data-name="EFV TM VOL 2: MINDOS (English Paperback)" data-price="298">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #fff; color: black; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Paperback</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span
+                            style="color: rgba(255,255,255,0.7); font-size: 0.9rem; display: block; margin-bottom: 10px;">(Paperback
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- Audiobook Product: EFV Canon Volume 2 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_audio_en"
+                    data-name="EFV TM VOL 2: MINDOS (English Audiobook)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #ff6b35; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Audiobook</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2 Audiobook" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span style="color: #ff6b35; font-size: 0.9rem; display: block; margin-bottom: 10px;">(Audiobook
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Decoding Thought, Emotion & The Architecture Of The Human Mind.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+
+                <!-- E-book Product: EFV Canon Volume 2 (English) -->
+                <div class="product-card glass-panel reveal magnetic shine-box" data-id="efv_canon_v2_ebook_en"
+                    data-name="EFV TM VOL 2: MINDOS (English E-book)" data-price="0">
+                    <div class="book-cover"
+                        style="width: 100%; max-width: 280px; aspect-ratio: 2/3; margin: 0 auto 20px; background: #0b132b; border-radius: 10px; overflow: hidden; border: 1px solid var(--gold-energy); position: relative;">
+                        <span
+                            style="position: absolute; top: 10px; right: 10px; background: #4ecdc4; color: white; padding: 4px 12px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; z-index: 5; text-transform: uppercase; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">E-book</span>
+                        <img src="img/vol 2.png" alt="EFV Canon Volume 2 E-book" loading="lazy"
+                            style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="product-info" style="text-align: center;">
+                        <h3 style="font-size: 1.1rem; letter-spacing: 1px; margin-bottom: 5px;">
+                            VOL 2: MINDOS&trade;
+                        </h3>
+                        <span style="color: #4ecdc4; font-size: 0.9rem; display: block; margin-bottom: 10px;">(E-book
+                            Edition)</span>
+                    </div>
+                    <div class="rating" style="color: var(--gold-energy); margin: 10px 0; text-align: center;">
+                        <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i
+                            class="fas fa-star"></i><i class="fas fa-star"></i>
+                    </div>
+                    <p
+                        style="margin-bottom: 20px; font-size: 0.9rem; opacity: 0.8; height: 75px; text-align: center; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+                        <span>Read anytime, anywhere on your digital devices.</span>
+                        <span
+                            style="color: var(--gold-energy); font-size: 0.85rem; font-weight: 500; margin-top: 8px; text-decoration: underline; text-decoration-color: var(--gold-energy); text-underline-offset: 4px; text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);">English
+                            Edition</span>
+                    </p>
+                    <span class="price" style="font-size: 1.5rem;">Coming Soon</span>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; flex-direction: column;">
+                        <button class="btn btn-gold" disabled
+                            style="width: auto; padding: 12px 30px; margin: 0 auto; opacity: 0.6; cursor: not-allowed;">Coming
+                            Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-card" style="max-width: 400px; padding: 30px;">
+            <div class="modal-close" id="close-auth-modal">&times;</div>
+            <div class="auth-tabs"
+                style="display: flex; border-bottom: 1px solid rgba(255, 211, 105, 0.2); margin-bottom: 20px;">
+                <div class="auth-tab active" id="tab-login"
+                    style="flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--gold-energy); border-bottom: 2px solid var(--gold-energy);">
+                    Login</div>
+                <div class="auth-tab" id="tab-signup"
+                    style="flex: 1; text-align: center; padding: 10px; cursor: pointer; opacity: 0.6;">Sign Up</div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" placeholder="Email Address" required
+                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <input type="password" placeholder="Password" required
+                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Login</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signup-form" style="display: none; flex-direction: column; gap: 15px;">
+                <input type="text" placeholder="Full Name" required
+                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <input type="email" placeholder="Email Address" required
+                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <input type="password" placeholder="Password" required
+                    style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Side Cart -->
+    <div id="cart-panel">
+        <div class="cart-header">
+            <h3>Your <span class="gold-text">Cart</span></h3>
+            <div class="close-cart">&times;</div>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <!-- Items injected by JS -->
+            <p style="text-align: center; margin-top: 50px; opacity: 0.5;">Your cart is empty.</p>
+        </div>
+        <div class="cart-total">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <span>Total:</span>
+                <span class="gold-text" id="cart-total-price">₹0.00</span>
+            </div>
+            <button class="btn btn-gold" id="checkout-btn" style="width: 100%; margin-bottom: 15px;">Checkout
+                Now</button>
+            <div class="auth-options" style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" id="cart-login-btn"
+                    style="flex: 1; font-size: 0.9rem; padding: 10px;">Login</button>
+                <button class="btn btn-outline" id="cart-signup-btn"
+                    style="flex: 1; font-size: 0.9rem; padding: 10px;">Sign Up</button>
+            </div>
+        </div>
+
+        <!-- User Profile View (Hidden by default) -->
+        <div id="user-profile-view" style="display: none; padding: 20px; color: var(--gold-light);">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div
+                    style="width: 80px; height: 80px; background: rgba(255, 211, 105, 0.1); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--gold-energy);">
+                    <i class="fas fa-user" style="font-size: 2rem; color: var(--gold-energy);"></i>
+                </div>
+                <h3 style="color: var(--gold-energy);">John Doe</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">john.doe@example.com</p>
+            </div>
+            <h4 style="border-bottom: 1px solid rgba(255, 211, 105, 0.2); padding-bottom: 10px; margin-bottom: 15px;">
+                Purchase History</h4>
+            <div id="purchase-history-list"
+                style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
+                <!-- Mock Items -->
+                <div
+                    style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9rem;">EFV Volume 1</span>
+                    <span class="gold-text">₹499</span>
+                </div>
+            </div>
+
+            <!-- My Library Section -->
+            <h4
+                style="border-bottom: 1px solid rgba(255, 211, 105, 0.2); padding-bottom: 10px; margin-bottom: 15px; margin-top: 30px;">
+                My Library</h4>
+            <div id="my-library-list"
+                style="display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;">
+                <p style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No digital products yet.</p>
+            </div>
+
+            <button class="btn btn-outline" id="logout-btn" style="width: 100%; margin-top: 20px;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="logo footer-logo">
+                        <img src="img/AISA.svg" alt="AISA Logo">
+                        <span>EFV<sup>TM</sup></span>
+                    </div>
+                    <p>World's first EFV<sup>TM</sup> system. Designed for better living.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="about.html">About EFV<sup>TM</sup></a></li>
+                        <li><a href="uwo.html">About UWO<sup>TM</sup></a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="preview.html">Preview</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="Feedback.html">Feedback</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61585343488735" class="social-icon-link"
+                            aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <img src="img/FB.svg" alt="Facebook" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.instagram.com/efv_framework/" class="social-icon-link"
+                            aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Insta (1).svg" alt="Instagram" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.linkedin.com/in/efv-framework/" class="social-icon-link"
+                            aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Linkedin.svg" alt="LinkedIn" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.threads.com/@efv_framework" class="social-icon-link" aria-label="Threads"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/Threads.svg" alt="Threads" style="width: 32px; height: 32px;">
+                        </a>
+                        <!-- <a href="#" class="social-icon-link" aria-label="WhatsApp">
+                            <img src="img/Whatsapp.svg" alt="WhatsApp" style="width: 32px; height: 32px;">
+                        </a> -->
+                        <a href="https://x.com/EfvFrame_work" class="social-icon-link" aria-label="X (Twitter)"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/x.png" alt="X (Twitter)"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="#" class="social-icon-link" aria-label="YouTube" target="_blank"
+                            rel="noopener noreferrer">
+                            <img src="img/YT (1).svg" alt="YouTube" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://in.pinterest.com/EFV_Framework/" class="social-icon-link"
+                            aria-label="Pinterest" target="_blank" rel="noopener noreferrer">
+                            <img src="img/pinterset.png" alt="Pinterest" style="width: 26px; height: 26px;">
+                        </a>
+                        <a href="mailto:admin@uwo24.com" class="social-icon-link" aria-label="Gmail">
+                            <img src="img/gmail.png" alt="Gmail" style="width: 26px; height: 26px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; UWO<sup>TM</sup> — EFV<sup>TM</sup> is a UWO<sup>TM</sup> Innovation.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/particles.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/productsData.js?v=22.0"></script>
+    <script src="js/cart.js?v=22.0"></script>
+    <script src="js/chatbot.js?v=9.0"></script>
+</body>
+
+</html>

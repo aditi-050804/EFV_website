@@ -1,0 +1,2036 @@
+/**
+ * EFV Cart JS - Shopping Logic
+ */
+console.log("EFV Cart JS Loaded - Version: 22.0 - Forced Cache Refresh");
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Inject Cart HTML if not present
+    if (!document.getElementById('cart-panel')) {
+        const cartHTML = `
+    <!-- Cart Modal -->
+    <div class="cart-backdrop"></div>
+    <div id="cart-panel">
+        <div class="cart-header">
+            <h3>Your <span class="gold-text">Cart</span></h3>
+            <div class="close-cart" style="cursor: pointer; font-size: 1.5rem;">&times;</div>
+        </div>
+        <div class="cart-items" id="cart-items-container" style="flex: 1; overflow-y: auto;">
+            <!-- Items injected by JS -->
+            <p style="text-align: center; margin-top: 50px; opacity: 0.5;">Your cart is empty.</p>
+        </div>
+        <div class="cart-total">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                <span>Total:</span>
+                <span class="gold-text" id="cart-total-price">₹0.00</span>
+            </div>
+            <button class="btn btn-gold" id="checkout-btn" style="width: 100%; margin-bottom: 15px;">Checkout Now</button>
+            <div class="auth-options" style="display: flex; gap: 10px;">
+                <button class="btn btn-outline" id="cart-login-btn" style="flex: 1; font-size: 0.9rem; padding: 10px;">Login</button>
+                <button class="btn btn-outline" id="cart-signup-btn" style="flex: 1; font-size: 0.9rem; padding: 10px;">Sign Up</button>
+            </div>
+        </div>
+
+        <!-- User Profile View (Hidden by default) -->
+        <div id="user-profile-view" style="display: none; padding: 20px; color: var(--gold-light);">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="width: 80px; height: 80px; background: rgba(255, 211, 105, 0.1); border-radius: 50%; margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--gold-energy);">
+                    <i class="fas fa-user" style="font-size: 2rem; color: var(--gold-energy);"></i>
+                </div>
+                <h3 style="color: var(--gold-energy);">John Doe</h3>
+                <p style="font-size: 0.9rem; opacity: 0.7;">john.doe@example.com</p>
+            </div>
+            <h4 style="border-bottom: 1px solid rgba(255, 211, 105, 0.2); padding-bottom: 10px; margin-bottom: 15px;">Purchase History</h4>
+            <div id="purchase-history-list" style="display: flex; flex-direction: column; gap: 10px; max-height: 200px; overflow-y: auto;">
+                <!-- Mock Items -->
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9rem;">EFV Volume 1</span>
+                    <span class="gold-text">₹499</span>
+                </div>
+            </div>
+            <button class="btn btn-outline" id="logout-btn" style="width: 100%; margin-top: 20px;">Logout</button>
+        </div>
+    </div>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="auth-modal">
+        <div class="modal-card" style="max-width: 400px; padding: 30px;">
+            <div class="modal-close" id="close-auth-modal">&times;</div>
+            <div class="auth-tabs" style="display: flex; border-bottom: 1px solid rgba(255, 211, 105, 0.2); margin-bottom: 20px;">
+                <div class="auth-tab active" id="tab-login" style="flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--gold-energy); border-bottom: 2px solid var(--gold-energy);">Login</div>
+                <div class="auth-tab" id="tab-signup" style="flex: 1; text-align: center; padding: 10px; cursor: pointer; opacity: 0.6;">Sign Up</div>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" style="display: flex; flex-direction: column; gap: 15px;">
+                <input type="email" placeholder="Email Address" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <input type="password" placeholder="Password" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Login</button>
+            </form>
+
+            <!-- Sign Up Form -->
+            <form id="signup-form" style="display: none; flex-direction: column; gap: 15px;">
+                <input type="text" placeholder="Full Name" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <input type="email" placeholder="Email Address" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <input type="password" placeholder="Password" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
+                <button type="submit" class="btn btn-gold" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </div>`;
+        document.body.insertAdjacentHTML('beforeend', cartHTML);
+    }
+
+    // Inject Product Detail Modal HTML if not present
+    if (!document.getElementById('product-detail-modal')) {
+        const productModalHTML = `
+        <div class="product-modal-overlay" id="product-detail-modal">
+            <div class="product-modal-card">
+                <div class="pm-close">&times;</div>
+                <div class="pm-left">
+                    <div class="pm-image-container">
+                        <img src="" alt="Product Cover" id="pm-img">
+                    </div>
+                    <div class="pm-main-actions">
+                        <button class="pm-btn pm-btn-cart" id="pm-add-to-cart"><i class="fas fa-shopping-cart"></i> ADD TO CART</button>
+                        <button class="pm-btn pm-btn-buy" id="pm-buy-now"><i class="fas fa-bolt"></i> BUY NOW</button>
+                    </div>
+                </div>
+                <div class="pm-right">
+                    <div class="pm-title-section">
+                        <h2 class="pm-title" id="pm-title">EFV™ VOL 1: THE ORIGIN CODE™</h2>
+                        <span class="pm-edition" id="pm-edition">Hardcover Edition</span>
+                        <div class="pm-rating">
+                            <span>4.8 ★</span>
+                            <span style="opacity: 0.5;">2,450 Reviews</span>
+                        </div>
+                        <div class="pm-price-row">
+                            <span class="pm-price" id="pm-price">₹499</span>
+                            <span class="pm-mrp" id="pm-mrp">₹999</span>
+                            <span class="pm-discount">50% off</span>
+                        </div>
+                    </div>
+
+                    <div class="pm-quantity-section" style="margin: 20px 0; padding: 15px; background: rgba(255, 211, 105, 0.05); border-radius: 10px; border: 1px solid rgba(255, 211, 105, 0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <span style="font-weight: 600; color: var(--gold-energy);">Select Quantity:</span>
+                            <div class="pm-quantity-controls" style="display: flex; align-items: center; gap: 15px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(255,211,105,0.3);">
+                                <button id="pm-qty-minus" style="background:none; border:none; color:var(--gold-energy); cursor:pointer; font-size:1.2rem; padding:0 5px;"><i class="fas fa-minus"></i></button>
+                                <span id="pm-qty-value" style="font-size:1.1rem; font-weight:700; min-width:20px; text-align:center;">1</span>
+                                <button id="pm-qty-plus" style="background:none; border:none; color:var(--gold-energy); cursor:pointer; font-size:1.2rem; padding:0 5px;"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="opacity: 0.7; font-size: 0.9rem;">Subtotal:</span>
+                            <span id="pm-subtotal" style="font-size: 1.3rem; font-weight: 800; color: var(--gold-energy);">₹499</span>
+                        </div>
+                    </div>
+
+                    <div class="pm-collection-intro">
+                        <h3>The EFV™ Collection</h3>
+                        <p>Discover the transformative power of Energy, Frequency, and Vibration. Each volume in this sacred series is designed to align your consciousness with the universal code of existence.</p>
+                    </div>
+
+                    <div class="pm-tabs">
+                        <div class="pm-tab-headers">
+                            <button class="pm-tab-btn active" data-tab="specs">Specifications</button>
+                            <button class="pm-tab-btn" data-tab="desc">Description</button>
+                            <button class="pm-tab-btn" data-tab="mfr">Manufacturer info</button>
+                        </div>
+                        <div class="pm-tab-content active" id="tab-specs">
+                            <table class="pm-specs-table" id="pm-specs-body">
+                                <!-- Dynamic rows -->
+                            </table>
+                        </div>
+                        <div class="pm-tab-content" id="tab-desc">
+                            <p id="pm-desc-text"></p>
+                        </div>
+                        <div class="pm-tab-content" id="tab-mfr">
+                            <div class="pm-mfr-list">
+                                <div class="pm-mfr-item">
+                                    <span class="pm-mfr-label">Generic Name</span>
+                                    <span class="pm-mfr-value" id="pm-generic-name">Books</span>
+                                </div>
+                                <div class="pm-mfr-item">
+                                    <span class="pm-mfr-label">Country of Origin</span>
+                                    <span class="pm-mfr-value" id="pm-origin-text">India</span>
+                                </div>
+                                <div class="pm-mfr-item">
+                                    <span class="pm-mfr-label">Name and address of the Manufacturer</span>
+                                    <span class="pm-mfr-value" id="pm-mfr-full"></span>
+                                </div>
+                                <div class="pm-mfr-item">
+                                    <span class="pm-mfr-label">Name and address of the Packer</span>
+                                    <span class="pm-mfr-value" id="pm-packer-full"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', productModalHTML);
+    }
+
+    let cart = JSON.parse(localStorage.getItem('efv_cart')) || [];
+
+    // User Data Isolation Helpers
+    function getUserKey(baseKey) {
+        const user = JSON.parse(localStorage.getItem('efv_user'));
+        if (!user || !user.email) return baseKey;
+        // Clean email to use as key part (remove special chars)
+        const cleanEmail = user.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
+        return `${baseKey}_${cleanEmail}`;
+    }
+
+    // Sync library from backend to localStorage
+    async function syncLibraryWithBackend() {
+        const user = JSON.parse(localStorage.getItem('efv_user'));
+        if (!user || !user.email) return;
+
+        try {
+            const demoToken = btoa(user.email);
+            const response = await fetch('http://localhost:5000/api/demo/library', {
+                headers: { 'Authorization': `Bearer ${demoToken}` }
+            });
+            const data = await response.json();
+
+            if (response.ok && data.library) {
+                const libKey = getUserKey('efv_digital_library');
+                // Store in isolated localStorage
+                const localLibrary = data.library.map(prod => ({
+                    id: prod._id,
+                    name: prod.title,
+                    type: prod.type === 'AUDIOBOOK' ? 'Audiobook' : 'E-Book',
+                    date: new Date().toLocaleDateString() // Mock date
+                }));
+                localStorage.setItem(libKey, JSON.stringify(localLibrary));
+
+                // Refresh UI components
+                updateLibraryDisplay();
+                updateMarketplaceButtons();
+            }
+        } catch (error) {
+            console.error('Library sync error:', error);
+        }
+    }
+
+    // Update Marketplace buttons to reflect library state
+    function updateMarketplaceButtons() {
+        const libKey = getUserKey('efv_digital_library');
+        const library = JSON.parse(localStorage.getItem(libKey)) || [];
+
+        document.querySelectorAll('.product-card').forEach(card => {
+            const id = card.getAttribute('data-id');
+            const btn = card.querySelector('.add-to-cart');
+
+            if (btn && (id.includes('audio') || id.includes('ebook'))) {
+                const isOwned = library.some(item => item.id === id);
+                if (isOwned) {
+                    btn.textContent = '✓ In Library';
+                    btn.style.background = '#10b981';
+                    btn.disabled = false; // Keep clickable to allow access but logic handles it
+                } else {
+                    btn.textContent = 'Purchase Now';
+                    btn.style.background = '';
+                    btn.disabled = false;
+                }
+            }
+        });
+    }
+    // Select via ID (if updated) or Class for standard items
+    const cartToggle = document.getElementById('cart-toggle') || document.querySelector('.cart-icon');
+    const cartPanel = document.getElementById('cart-panel');
+    const cartBackdrop = document.querySelector('.cart-backdrop');
+    const closeCart = document.querySelector('.close-cart');
+    const cartCount = document.getElementById('cart-count');
+    const cartContainer = document.getElementById('cart-items-container');
+    const cartTotalDisplay = document.getElementById('cart-total-price');
+
+    function updateCartUI() {
+        // Update Count
+        const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
+        cartCount.textContent = totalItems;
+
+        // Update List
+        if (cart.length === 0) {
+            cartContainer.innerHTML = '<p style="text-align: center; margin-top: 50px; opacity: 0.5;">Your cart is empty.</p>';
+            cartTotalDisplay.textContent = '₹0.00';
+        } else {
+            cartContainer.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <div class="cart-item-info" style="flex: 1;">
+                        <h4 style="margin-bottom: 5px;">${item.name}</h4>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="gold-text">₹${item.price} x ${item.quantity}</span>
+                            <button class="remove-item" data-id="${item.id}" 
+                                style="background: none; border: none; color: #ff6b6b; cursor: pointer; padding: 0; font-size: 0.9rem; display: flex; align-items: center;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((acc, item) => acc + (item.price * item.quantity), 0);
+            cartTotalDisplay.textContent = `₹${total.toFixed(2)}`;
+        }
+
+        localStorage.setItem('efv_cart', JSON.stringify(cart));
+
+        // Add Remove listeners
+        document.querySelectorAll('.remove-item').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                cart = cart.filter(item => item.id !== id);
+                updateCartUI();
+            });
+        });
+    }
+
+    // Open Product Modal
+    function openProductModal(productId, card) {
+        const modal = document.getElementById('product-detail-modal');
+        const data = window.EFV_Products[productId] || {
+            title: card.getAttribute('data-name'),
+            edition: card.querySelector('.pm-edition')?.textContent || card.querySelector('span[style*="color: var(--gold-energy)"]')?.textContent || "Special Edition",
+            description: card.querySelector('p')?.textContent || "Premium EFV volume content.",
+            specs: { "Product Form": "Book" },
+            manufacturer: "EFV Intelligence",
+            countryOfOrigin: "India"
+        };
+
+        // Populate Image
+        const img = card.querySelector('img').src;
+        document.getElementById('pm-img').src = img;
+
+        // Populate Text
+        document.getElementById('pm-title').textContent = data.title;
+        document.getElementById('pm-edition').textContent = data.edition;
+        document.getElementById('pm-price').textContent = `₹${card.getAttribute('data-price')}`;
+        document.getElementById('pm-mrp').textContent = `₹${Math.round(card.getAttribute('data-price') * 2)}`;
+        document.getElementById('pm-desc-text').textContent = data.description;
+
+        // Reset Quantity and Subtotal
+        const qtyValue = document.getElementById('pm-qty-value');
+        const subtotal = document.getElementById('pm-subtotal');
+        if (qtyValue) qtyValue.textContent = '1';
+        if (subtotal) subtotal.textContent = `₹${card.getAttribute('data-price')}`;
+
+        // Populate Mfr Info detailed
+        document.getElementById('pm-generic-name').textContent = data.genericName || "Books";
+        document.getElementById('pm-origin-text').textContent = data.countryOfOrigin || "India";
+        document.getElementById('pm-mfr-full').textContent = `${data.mfrName || ''}, ${data.mfrAddress || ''}`;
+        document.getElementById('pm-packer-full').textContent = `${data.packerName || ''}, ${data.packerAddress || ''}`;
+
+        // Populate Specs
+        const specsBody = document.getElementById('pm-specs-body');
+        specsBody.innerHTML = Object.entries(data.specs).map(([label, value]) => `
+            <tr>
+                <td class="pm-spec-label">${label}</td>
+                <td class="pm-spec-value">${value}</td>
+            </tr>
+        `).join('') + `
+            <tr>
+                <td class="pm-spec-label">Generic Name</td>
+                <td class="pm-spec-value">Books</td>
+            </tr>
+        `;
+
+        // Store current product ID on buttons
+        const addBtn = document.getElementById('pm-add-to-cart');
+        const buyBtn = document.getElementById('pm-buy-now');
+        addBtn.setAttribute('data-target-id', productId);
+        buyBtn.setAttribute('data-target-id', productId);
+
+        // Reset Tabs
+        document.querySelectorAll('.pm-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.pm-tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector('.pm-tab-btn[data-tab="specs"]').classList.add('active');
+        document.getElementById('tab-specs').classList.add('active');
+
+        // Show Modal
+        modal.classList.add('active');
+        document.body.classList.add('modal-open');
+
+        // NUCLEAR RESET: Clear all filters globally
+        document.documentElement.style.filter = 'none';
+        document.body.style.filter = 'none';
+
+        const forceClear = () => {
+            const card = document.querySelector('.product-modal-card');
+            const overlay = document.querySelector('.product-modal-overlay');
+            if (card) {
+                card.style.setProperty('filter', 'none', 'important');
+                card.style.setProperty('backdrop-filter', 'none', 'important');
+            }
+            if (overlay) {
+                overlay.style.setProperty('backdrop-filter', 'none', 'important');
+            }
+        };
+
+        // Run immediately and after short delays to catch transition end
+        forceClear();
+        setTimeout(forceClear, 50);
+        setTimeout(forceClear, 300);
+        setTimeout(forceClear, 600);
+
+        // Multi-Action Delegation (Tabs + Buttons)
+        if (modal && !modal.hasAttribute('data-listeners-init')) {
+            modal.addEventListener('click', (e) => {
+                // 1. Tab Switching
+                const tabBtn = e.target.closest('.pm-tab-btn');
+                if (tabBtn) {
+                    const tabId = tabBtn.getAttribute('data-tab');
+                    modal.querySelectorAll('.pm-tab-btn').forEach(b => b.classList.remove('active'));
+                    modal.querySelectorAll('.pm-tab-content').forEach(c => c.classList.remove('active'));
+                    tabBtn.classList.add('active');
+                    const content = modal.querySelector(`#tab-${tabId}`);
+                    if (content) content.classList.add('active');
+                    return;
+                }
+
+                // 2. Add to Cart (Internal)
+                const actionBtn = e.target.closest('#pm-add-to-cart');
+                if (actionBtn) {
+                    const id = actionBtn.getAttribute('data-target-id');
+                    const card = document.querySelector(`.product-card[data-id="${id}"]`);
+                    const qty = parseInt(document.getElementById('pm-qty-value')?.textContent) || 1;
+                    if (card) {
+                        processAddToCart(id, card, false, qty);
+                        modal.classList.remove('active');
+                        document.body.classList.remove('modal-open');
+                    }
+                    return;
+                }
+
+                // 3. Buy Now (Internal)
+                const buyBtnAction = e.target.closest('#pm-buy-now');
+                if (buyBtnAction) {
+                    const id = buyBtnAction.getAttribute('data-target-id');
+                    const card = document.querySelector(`.product-card[data-id="${id}"]`);
+                    const qty = parseInt(document.getElementById('pm-qty-value')?.textContent) || 1;
+                    if (card) {
+                        showTermsAndConditions(() => {
+                            const name = card.getAttribute('data-name');
+                            const price = parseFloat(card.getAttribute('data-price'));
+                            const item = { id, name, price, quantity: qty };
+
+                            modal.classList.remove('active');
+                            document.body.classList.remove('modal-open');
+                            // Directly checkout with ONLY this item
+                            checkoutOrder([item]);
+                        });
+                    }
+                    return;
+                }
+
+                // New logic: Quantity Controls
+                const minusBtn = e.target.closest('#pm-qty-minus');
+                const plusBtn = e.target.closest('#pm-qty-plus');
+
+                if (minusBtn || plusBtn) {
+                    const qtyElem = document.getElementById('pm-qty-value');
+                    const subtotalElem = document.getElementById('pm-subtotal');
+                    const price = parseFloat(document.getElementById('pm-price').textContent.replace('₹', '')) || 0;
+                    let currentQty = parseInt(qtyElem.textContent) || 1;
+
+                    if (minusBtn && currentQty > 1) currentQty--;
+                    if (plusBtn) currentQty++;
+
+                    qtyElem.textContent = currentQty;
+                    subtotalElem.textContent = `₹${(price * currentQty).toFixed(2)}`;
+                    return;
+                }
+
+                // 4. Close Modal
+                const closeBtn = e.target.closest('.pm-close') || e.target === modal;
+                if (closeBtn) {
+                    modal.classList.remove('active');
+                    document.body.classList.remove('modal-open');
+                    return;
+                }
+            });
+            modal.setAttribute('data-listeners-init', 'true');
+        }
+    }
+
+    // --- Terms & Conditions Logic ---
+    function showTermsAndConditions(onAccept) {
+        let tcOverlay = document.getElementById('tc-modal');
+        if (!tcOverlay) {
+            const tcHTML = `
+            <div class="tc-modal-overlay" id="tc-modal">
+                <div class="tc-card">
+                    <div class="tc-close">&times;</div>
+                    <h2 class="tc-title"><i class="fas fa-file-contract" style="margin-right:15px;"></i>Terms & Conditions</h2>
+                    <div class="tc-content">
+                        <p style="text-align:center; font-style:italic; border-bottom:1px solid var(--glass-border); padding-bottom:15px; margin-bottom:20px;">Last Updated: 13/02/2026</p>
+                        
+                        <p>Welcome to EFV. By purchasing “EFV” (Energy–Frequency–Vibration) book from our website, you agree to the following terms:</p>
+
+                        <strong>1. Product Information</strong>
+                        <p>We sell physical copies (Hardcover / Paperback) and digital formats (E-book / Audiobook) of EFV.</p>
+
+                        <strong>2. Pricing & Payments</strong>
+                        <p>• All prices are listed in INR.<br>• Payments are processed securely via Razorpay.<br>• We reserve the right to change prices.</p>
+
+                        <strong>3. Order Confirmation</strong>
+                        <p>• You will receive an email confirmation after successful payment.<br>• Orders are processed within 2-3 working days.</p>
+
+                        <strong>4. Shipping & Delivery (For Physical Books)</strong>
+                        <p>• Delivery timelines: Depends on delivery location.<br>• Delays due to courier or external factors may happen.<br>• Incorrect shipping details provided by the customer are the customer’s responsibility.</p>
+
+                        <strong>5. Refund & Cancellation</strong>
+                        <p>• Physical books: Refunds allowed only if product is damaged on delivery, opening video required. (proof required within 48 hours).<br>• Digital products (E-book / Audiobook): Non-refundable once delivered.<br>• Refund processing time: 5–7 business days.</p>
+
+                        <strong>6. Intellectual Property</strong>
+                        <p>All content of EFV is protected by copyright. Unauthorized reproduction, distribution, or sharing (especially digital formats) is strictly prohibited.</p>
+
+                        <strong>7. Governing Law</strong>
+                        <p>These terms are governed by the laws of India.</p>
+
+                        <strong>8. Contact Information</strong>
+                        <p>For support or queries:<br>Email: admin@uwo24.com<br>Company Name: Unified Web Options and Services Private Limited<br>Project: EFV- Energy Frequency Vibration</p>
+                    </div>
+                    <div class="tc-footer">
+                        <label class="tc-checkbox-container">
+                            <input type="checkbox" id="tc-accept-check">
+                            <span class="tc-checkmark"></span>
+                            I agree to the Terms & Conditions
+                        </label>
+                        <button class="tc-btn" id="tc-proceed-btn" disabled>PROCEED TO PAYMENT</button>
+                    </div>
+                </div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', tcHTML);
+            tcOverlay = document.getElementById('tc-modal');
+        }
+
+        const checkbox = tcOverlay.querySelector('#tc-accept-check');
+        const proceedBtn = tcOverlay.querySelector('#tc-proceed-btn');
+        const closeBtn = tcOverlay.querySelector('.tc-close');
+
+        checkbox.checked = false;
+        proceedBtn.disabled = true;
+
+        tcOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        const handleCheck = () => {
+            proceedBtn.disabled = !checkbox.checked;
+        };
+
+        const handleProceed = () => {
+            tcOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            proceedBtn.removeEventListener('click', handleProceed);
+            checkbox.removeEventListener('change', handleCheck);
+            if (onAccept) onAccept();
+        };
+
+        const handleClose = () => {
+            tcOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+            proceedBtn.removeEventListener('click', handleProceed);
+            checkbox.removeEventListener('change', handleCheck);
+        };
+
+        checkbox.addEventListener('change', handleCheck);
+        proceedBtn.addEventListener('click', handleProceed);
+        closeBtn.addEventListener('click', handleClose);
+    }
+
+    // --- QR Payment Modal Logic ---
+
+
+    // Helper for actual cart addition logic
+    function processAddToCart(id, card, triggerModal = true, customQty = 1) {
+        if (triggerModal) {
+            openProductModal(id, card);
+            return;
+        }
+
+        const name = card.getAttribute('data-name');
+        const price = parseFloat(card.getAttribute('data-price'));
+        const isDigitalProduct = id.includes('audio') || id.includes('ebook');
+
+        const quantityToAdd = parseInt(customQty) || 1;
+
+        if (isDigitalProduct) {
+            // Instant delivery: Add to library locally
+            const libKey = getUserKey('efv_digital_library');
+            let library = JSON.parse(localStorage.getItem(libKey)) || [];
+
+            const alreadyOwned = library.some(l => l.id === id);
+
+            // Demo Mode: Always add to library locally for testing
+            if (!alreadyOwned) {
+                library.push({
+                    id: id,
+                    name: name,
+                    type: id.includes('audio') ? 'Audiobook' : 'E-Book',
+                    date: new Date().toLocaleDateString()
+                });
+                localStorage.setItem(libKey, JSON.stringify(library));
+
+                // Show ephemeral message for demo
+                const demoMsg = document.createElement('div');
+                Object.assign(demoMsg.style, {
+                    position: 'fixed',
+                    bottom: '20px',
+                    right: '20px',
+                    background: '#10b981',
+                    color: 'white',
+                    padding: '15px 25px',
+                    borderRadius: '8px',
+                    zIndex: '10000',
+                    boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
+                    fontWeight: 'bold',
+                    animation: 'fadeIn 0.5s ease-out'
+                });
+                demoMsg.innerHTML = '<i class="fas fa-check-circle"></i> Added to Library (Demo Access)';
+                document.body.appendChild(demoMsg);
+                setTimeout(() => demoMsg.remove(), 3000);
+
+                // Sync with Backend (Demo Account)
+                const user = JSON.parse(localStorage.getItem('efv_user'));
+                if (user && user.email) {
+                    const demoToken = btoa(user.email);
+                    fetch('http://localhost:5000/api/demo/add-to-library', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${demoToken}`
+                        },
+                        body: JSON.stringify({ productId: id })
+                    }).catch(err => console.error('❌ Backend Sync Failed:', err));
+                }
+            }
+
+            // Also add to cart for records (so they can see it in cart too)
+            const existingInCart = cart.find(item => item.id === id);
+            if (!existingInCart) {
+                cart.push({ id, name, price, quantity: quantityToAdd });
+                localStorage.setItem('efv_cart', JSON.stringify(cart));
+            }
+
+            updateCartUI();
+            if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
+            if (typeof updateMarketplaceButtons === 'function') updateMarketplaceButtons();
+
+            // Open Cart Panel to show it's added
+            toggleCart(true);
+        } else {
+            // Physical
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity += quantityToAdd;
+            } else {
+                cart.push({ id, name, price, quantity: quantityToAdd });
+            }
+            updateCartUI();
+
+            // Show Standard Cart for physical (ensure profile is hidden)
+            toggleUserProfile(false);
+            toggleCart(true);
+        }
+    }
+
+    // Outer "Add to Cart" listener (Global Delegation)
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.add-to-cart');
+        if (!btn || btn.classList.contains('pm-btn')) return; // Ignore modal buttons here
+
+        const card = btn.closest('.product-card');
+        if (card) {
+            const id = card.getAttribute('data-id');
+            const isDigital = id.includes('audio') || id.includes('ebook');
+
+            if (isDigital) {
+                // Instant Access for Digital
+                processAddToCart(id, card, false);
+            } else {
+                // Standard Flow for Physical
+                openProductModal(id, card);
+            }
+        }
+    });
+
+    function toggleCart(show) {
+        if (show) {
+            cartPanel.classList.add('active');
+            if (cartBackdrop) cartBackdrop.classList.add('active');
+            document.body.classList.add('modal-open');
+        } else {
+            cartPanel.classList.remove('active');
+            if (cartBackdrop) cartBackdrop.classList.remove('active');
+            document.body.classList.remove('modal-open');
+        }
+    }
+
+    // Panel Toggle
+    if (cartToggle) {
+        cartToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Check if user is logged in
+            const user = JSON.parse(localStorage.getItem('efv_user'));
+            if (user) {
+                // Redirect to Dashboard
+                window.location.href = 'profile.html';
+                return;
+            }
+
+            const isActive = cartPanel.classList.contains('active');
+            toggleCart(!isActive);
+        });
+    }
+
+    if (closeCart) {
+        closeCart.addEventListener('click', () => toggleCart(false));
+    }
+
+    if (cartBackdrop) {
+        cartBackdrop.addEventListener('click', () => toggleCart(false));
+    }
+
+    // Auth Logic
+    const checkoutBtn = document.getElementById('checkout-btn');
+    const loginBtn = document.getElementById('cart-login-btn');
+    const signupBtn = document.getElementById('cart-signup-btn');
+    const authModal = document.getElementById('auth-modal');
+    const closeAuthModal = document.getElementById('close-auth-modal');
+    const tabLogin = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+    const loginForm = document.getElementById('login-form');
+    const signupForm = document.getElementById('signup-form');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    // Views
+    const cartTotalSection = document.querySelector('.cart-total');
+    const cartItemsSection = document.getElementById('cart-items-container');
+    const userProfileView = document.getElementById('user-profile-view');
+
+    function openAuthModal(mode = 'login') {
+        if (!authModal) return;
+
+        // Hide cart when opening auth modal
+        toggleCart(false);
+
+        authModal.classList.add('active');
+        document.body.classList.add('modal-open');
+        if (mode === 'login') {
+            switchTab('login');
+        } else {
+            switchTab('signup');
+        }
+    }
+
+    function closeAuth() {
+        if (authModal) {
+            authModal.classList.remove('active');
+            if (!cartPanel.classList.contains('active')) {
+                document.body.classList.remove('modal-open');
+            }
+        }
+    }
+
+    function switchTab(mode) {
+        if (mode === 'login') {
+            tabLogin.classList.add('active');
+            tabSignup.classList.remove('active');
+            tabLogin.style.color = 'var(--gold-energy)';
+            tabLogin.style.borderBottom = '2px solid var(--gold-energy)';
+            tabSignup.style.opacity = '0.6';
+            tabSignup.style.borderBottom = 'none';
+            tabSignup.style.color = 'inherit';
+            loginForm.style.display = 'flex';
+            signupForm.style.display = 'none';
+        } else {
+            tabSignup.classList.add('active');
+            tabLogin.classList.remove('active');
+            tabSignup.style.color = 'var(--gold-energy)';
+            tabSignup.style.borderBottom = '2px solid var(--gold-energy)';
+            tabLogin.style.opacity = '0.6';
+            tabLogin.style.borderBottom = 'none';
+            tabLogin.style.color = 'inherit';
+            signupForm.style.display = 'flex';
+            loginForm.style.display = 'none';
+        }
+    }
+
+
+
+
+    // Update Library Display Helper
+    function updateLibraryDisplay(playingName = null) {
+        const libraryList = document.getElementById('my-library-list');
+        if (!libraryList) return;
+
+        const libKey = getUserKey('efv_digital_library');
+        const library = JSON.parse(localStorage.getItem(libKey)) || [];
+        if (library.length > 0) {
+            libraryList.innerHTML = library.map(item => {
+                const isPlaying = item.name === playingName;
+                const isPaused = isPlaying && currentAudio && currentAudio.paused;
+
+                const isAudio = item.type === 'Audiobook';
+                const progressInfo = (item.type === 'E-book' && item.progress) ?
+                    `<span style="margin-left: 10px; padding: 2px 6px; background: rgba(255,211,105,0.2); border-radius: 4px; color: var(--gold-energy); font-size: 0.7rem;">Page ${item.progress}</span>` : '';
+
+                // Audiobook specific progress
+                let lastListenedText = '';
+                let progressBar = '';
+                if (isAudio && item.lastPlayedTime) {
+                    const mins = Math.floor(item.lastPlayedTime / 60);
+                    const secs = Math.floor(item.lastPlayedTime % 60);
+                    lastListenedText = `<div style="font-size: 0.75rem; color: var(--gold-energy); margin-top: 4px; opacity: 0.8;">
+                        <i class="fas fa-history" style="font-size: 0.7rem; margin-right: 4px;"></i> Last listened: ${mins} min ${secs} sec
+                    </div>`;
+
+                    const percent = Math.min((item.lastPlayedTime / (item.totalDuration || 1)) * 100, 100);
+                    progressBar = `
+                        <div style="width: 100%; height: 3px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 8px; overflow: hidden;">
+                            <div style="width: ${percent}%; height: 100%; background: var(--gold-energy); box-shadow: 0 0 10px var(--gold-energy);"></div>
+                        </div>
+                    `;
+                }
+
+                return `
+                <div style="background: rgba(255, 211, 105, 0.1); padding: 12px; border-radius: 8px; border: 1px solid rgba(255, 211, 105, 0.2); display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="flex: 1;">
+                            <span style="font-size: 0.9rem; font-weight: 600;">${item.name}${progressInfo}</span>
+                            <span style="display: block; font-size: 0.75rem; opacity: 0.6; margin-top: 4px;">
+                                 ${isPlaying ? (isPaused ? '<span style="color:var(--gold-energy);">⏸ Paused</span>' : '<span style="color:#10b981;">▶ Now Playing...</span>') : `${item.type} • Added ${item.date}`}
+                            </span>
+                            ${lastListenedText}
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center; margin-left: 10px;">
+                            <button onclick="window.accessContent('${item.type}', '${item.name.replace(/'/g, "\\'")}')" 
+                                    style="background: ${isPlaying ? (isPaused ? 'var(--gold-energy)' : '#ff6b6b') : 'var(--gold-energy)'}; color: black; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; font-weight: bold; transition: all 0.3s; min-width: 80px;">
+                                ${isAudio ? (isPlaying ? (isPaused ? '<i class="fas fa-play"></i>' : '<i class="fas fa-pause"></i>') : '<i class="fas fa-play"></i> Listen') : (item.progress ? '<i class="fas fa-redo"></i> Resume' : '<i class="fas fa-book-open"></i> Read')}
+                            </button>
+                        </div>
+                    </div>
+                    ${progressBar}
+                </div>
+            `}).join('');
+        } else {
+            libraryList.innerHTML = '<p style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No digital products yet.</p>';
+        }
+    }
+
+    function updateHistoryDisplay() {
+        const historyList = document.getElementById('purchase-history-list');
+        if (!historyList) return;
+
+        const historyKey = getUserKey('efv_purchase_history');
+        const history = JSON.parse(localStorage.getItem(historyKey)) || [];
+        if (history.length > 0) {
+            historyList.innerHTML = history.map(h => `
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.9rem;">${h.name} ${h.quantity > 1 ? `x ${h.quantity}` : ''}</span>
+                    <span class="gold-text">₹${(h.price * h.quantity).toFixed(2)}</span>
+                </div>
+            `).join('');
+        } else {
+            historyList.innerHTML = '<p style="font-size: 0.8rem; opacity: 0.5; text-align: center;">No purchase history.</p>';
+        }
+    }
+
+    // --- UNIVERSAL SECURITY ENGINE ---
+    let currentAudio = null;
+    let currentPlayingName = null;
+    let isSecurityActive = false;
+    let globalFocusTracker = null;
+
+    // Global Security Style Injection
+    if (!document.getElementById('efv-security-styles')) {
+        const style = document.createElement('style');
+        style.id = 'efv-security-styles';
+        style.innerHTML = `
+            .global-security-alert {
+                position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+                background: #dc2626; color: white; padding: 40px 60px; border-radius: 20px;
+                font-weight: 900; z-index: 20000; text-align: center; display: none;
+                box-shadow: 0 0 200px rgba(220, 38, 38, 1); border: 8px solid white;
+                text-transform: uppercase; letter-spacing: 3px; font-family: 'Cinzel', serif;
+                animation: securityShake 0.1s ease-in-out infinite alternate;
+            }
+            @keyframes securityShake { from { transform: translate(-50.5%, -50%); } to { transform: translate(-49.5%, -50%); } }
+            .content-lockout { filter: none !important; opacity: 0.1 !important; pointer-events: none !important; }
+        `;
+        document.head.appendChild(style);
+        document.body.insertAdjacentHTML('beforeend', `
+            <div id="global-security-lock" class="global-security-alert">
+                <i class="fas fa-biohazard" style="font-size: 5rem; display: block; margin-bottom: 20px;"></i>
+                🚨 SECURE LOCK ACTIVE 🚨<br>
+                <span style="font-size: 1.2rem; margin-top: 15px; display: block;">CAPTURE ATTEMPT DETECTED</span>
+                <span style="font-size: 0.8rem; font-weight: 400; opacity: 0.8; margin-top: 20px; display: block;">Access suspended. Please return to active window to unlock.</span>
+            </div>
+        `);
+    }
+
+    const triggerGlobalLock = () => {
+        if (!isSecurityActive) return;
+
+        // 1. Pause Audio
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+            updateLibraryDisplay(currentPlayingName);
+        }
+
+        // 2. Blackout PDF
+        const pdfCard = document.getElementById('pdf-content-card');
+        if (pdfCard) pdfCard.classList.add('blackout');
+
+        // 3. Show Global Alert
+        document.getElementById('global-security-lock').style.display = 'block';
+    };
+
+    const releaseGlobalLock = () => {
+        document.getElementById('global-security-lock').style.display = 'none';
+        const pdfCard = document.getElementById('pdf-content-card');
+        if (pdfCard) pdfCard.classList.remove('blackout');
+    };
+
+    const globalSecurityBlur = () => triggerGlobalLock();
+    const globalSecurityFocus = () => releaseGlobalLock();
+
+    const globalPreventShortcuts = (e) => {
+        const isCtrlOrMeta = e.ctrlKey || e.metaKey;
+        const isWinKey = e.key === 'Meta' || e.keyCode === 91 || e.keyCode === 92;
+
+        // Block Ctrl+Shift+R (Screen record), Win+Shift+S, PrintScreen, etc.
+        if (
+            isWinKey || e.key === 'PrintScreen' || e.key === 'F12' ||
+            (isCtrlOrMeta && e.shiftKey && (e.key === 'R' || e.key === 'r' || e.key === 'S' || e.key === 's' || e.key === 'I' || e.key === 'i')) ||
+            (isCtrlOrMeta && (e.key === 'U' || e.key === 'u' || e.key === 'P' || e.key === 'p' || e.key === 'S' || e.key === 's'))
+        ) {
+            // Allow F12 for debugging if needed, but shield might trigger
+            if (e.key === 'F12') {
+                // For now, allow F12 without lock so user can see console
+                return;
+            }
+
+            e.preventDefault();
+            triggerGlobalLock();
+            // Alert removed to be less intrusive
+        }
+    };
+
+    const activateSecurityShield = () => {
+        if (isSecurityActive) return;
+        isSecurityActive = true;
+
+        window.addEventListener('blur', globalSecurityBlur);
+        window.addEventListener('focus', globalSecurityFocus);
+        document.addEventListener('keydown', globalPreventShortcuts, true);
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        window.addEventListener('mouseleave', globalSecurityBlur);
+        window.addEventListener('mouseenter', globalSecurityFocus);
+
+        // High frequency focus polling - DISABLED for better UX during testing/reading
+        // globalFocusTracker = setInterval(() => {
+        //     if (!document.hasFocus()) triggerGlobalLock();
+        // }, 150);
+    };
+
+    const deactivateSecurityShield = () => {
+        isSecurityActive = false;
+        clearInterval(globalFocusTracker);
+        window.removeEventListener('blur', globalSecurityBlur);
+        window.removeEventListener('focus', globalSecurityFocus);
+        document.removeEventListener('keydown', globalPreventShortcuts, true);
+        window.removeEventListener('mouseleave', globalSecurityBlur);
+        window.removeEventListener('mouseenter', globalSecurityFocus);
+        releaseGlobalLock();
+    };
+
+    window.accessContent = function (type, name) {
+        if (type === 'Audiobook') {
+            // Handle same item toggle
+            if (currentPlayingName === name && currentAudio) {
+                if (!currentAudio.paused) {
+                    currentAudio.pause();
+                    updateLibraryDisplay(name);
+                } else {
+                    currentAudio.play();
+                    updateLibraryDisplay(name);
+                }
+                return;
+            }
+
+            // Stop any existing audio if it's a different item
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio = null;
+            }
+
+            const launchAudio = (startTime = 0) => {
+                const audioPath = 'assets/videos/efv-audio.mp3';
+                try {
+                    console.log("Attempting to play audio (MP3):", audioPath, "at", startTime);
+                    currentAudio = new Audio(audioPath);
+                    currentPlayingName = name;
+
+                    currentAudio.onloadedmetadata = () => {
+                        if (startTime > 0) currentAudio.currentTime = startTime;
+                        currentAudio.play().then(() => {
+                            updateLibraryDisplay(name);
+                        }).catch(e => console.error('Audio Play Error:', e));
+                    };
+
+                    // Progress Tracking (Continuous 1s local, 5s backend)
+                    let lastLocalSave = 0;
+                    let lastCloudSave = 0;
+                    currentAudio.ontimeupdate = () => {
+                        const now = currentAudio.currentTime;
+
+                        // 1. Local update every ~1 second for smooth UI
+                        if (Math.abs(now - lastLocalSave) >= 1) {
+                            lastLocalSave = now;
+                            window.saveAudioProgress(name, now, currentAudio.duration, false, false); // false for syncCloud
+                        }
+
+                        // 2. Cloud update every ~5 seconds
+                        if (Math.abs(now - lastCloudSave) >= 5) {
+                            lastCloudSave = now;
+                            window.saveAudioProgress(name, now, currentAudio.duration, false, true); // true for syncCloud
+                        }
+                    };
+
+                    currentAudio.onpause = () => {
+                        window.saveAudioProgress(name, currentAudio.currentTime, currentAudio.duration);
+                        updateLibraryDisplay(name);
+                    };
+
+                    currentAudio.onended = () => {
+                        window.saveAudioProgress(name, 0, currentAudio.duration, true);
+                        currentPlayingName = null;
+                        currentAudio = null;
+                        updateLibraryDisplay(null);
+                    };
+
+                } catch (e) {
+                    alert('⚠️ Error initializing audio: ' + e.message);
+                }
+            };
+
+            const fetchAudioCloudProgress = async () => {
+                const libKey = getUserKey('efv_digital_library');
+                const library = JSON.parse(localStorage.getItem(libKey)) || [];
+                const item = library.find(i => i.name === name);
+                let localTime = (item && item.lastPlayedTime) ? parseFloat(item.lastPlayedTime) : 0;
+
+                const user = JSON.parse(localStorage.getItem('efv_user'));
+                if (user && user.email && item && item.id) {
+                    try {
+                        const demoToken = btoa(user.email);
+                        const res = await fetch(`http://localhost:5000/api/demo/progress/${item.id}`, {
+                            headers: { 'Authorization': `Bearer ${demoToken}` }
+                        });
+                        const data = await res.json();
+                        if (data && data.progress && parseFloat(data.progress) > localTime) {
+                            return parseFloat(data.progress);
+                        }
+                    } catch (e) {
+                        console.warn('Audio cloud progress fetch failed', e);
+                    }
+                }
+                return localTime;
+            };
+
+            fetchAudioCloudProgress().then(finalTime => {
+                if (finalTime > 10) {
+                    // Logic for resume modal handled via showResumeOption
+                    const mins = Math.floor(finalTime / 60);
+                    const secs = Math.floor(finalTime % 60);
+                    const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
+
+                    showResumeOption(name, timeStr,
+                        () => launchAudio(finalTime),
+                        () => launchAudio(0)
+                    );
+                } else {
+                    launchAudio(0);
+                }
+            });
+        } else {
+            // E-Book Logic (Secure Viewer)
+            console.log("Accessing content type:", type, "Name:", name);
+
+            // Get saved progress (Local - Default)
+            const libKey = getUserKey('efv_digital_library');
+            const library = JSON.parse(localStorage.getItem(libKey)) || [];
+            const item = library.find(i => i.name === name);
+            let savedPage = (item && item.progress) ? parseInt(item.progress) : 1;
+
+            // PDF Loading Strategy:
+            // 1. Try Base64 data first (Works on file:// and http://)
+            // 2. Fallback to file path (Works on http://, fails on file://)
+            let pdfSource = 'js/pdfjs/efv-checklist.pdf';
+
+            if (typeof EFV_PDF_DATA !== 'undefined') {
+                console.log("✅ Using Base64 PDF Data (Bypasses CORS/Protocol issues)");
+                pdfSource = EFV_PDF_DATA;
+            } else {
+                // Smart path resolution fallback
+                if (window.location.protocol === 'file:') {
+                    pdfSource = 'js/pdfjs/efv-checklist.pdf';
+                } else {
+                    pdfSource = '/js/pdfjs/efv-checklist.pdf';
+                }
+            }
+
+            console.log("Attempting to open PDF with source length:", pdfSource.length > 100 ? "Base64 Data" : pdfSource);
+
+            const launchViewer = (page) => {
+                toggleCart(false); // Auto-close
+                if (typeof openPdfViewer === 'function') {
+                    openPdfViewer(pdfSource, name, page);
+                } else {
+                    console.error("openPdfViewer function not found!");
+                    alert("Error: Internal viewer missing. Please reload the page.");
+                }
+            };
+
+            // Async Fetch from Backend (if online & logged in)
+            const fetchCloudProgress = async () => {
+                const user = JSON.parse(localStorage.getItem('efv_user'));
+                if (user && user.email) {
+                    try {
+                        const demoToken = btoa(user.email);
+                        // Use Item ID if available
+                        const productId = item ? item.id : null;
+
+                        if (productId) {
+                            const res = await fetch(`http://localhost:5000/api/demo/progress/${productId}`, {
+                                headers: { 'Authorization': `Bearer ${demoToken}` }
+                            });
+                            const data = await res.json();
+                            if (data && data.progress && data.progress > savedPage) {
+                                console.log(`☁️ Cloud progress found: Page ${data.progress} (Local: ${savedPage})`);
+                                return parseInt(data.progress);
+                            }
+                        }
+                    } catch (e) {
+                        console.warn('Cloud progress fetch failed, using local.', e);
+                    }
+                }
+                return savedPage;
+            };
+
+            // Execute Launch
+            fetchCloudProgress().then(finalPage => {
+                if (finalPage > 1) {
+                    // Resume Option
+                    if (typeof showResumeOption === 'function') {
+                        showResumeOption(name, finalPage,
+                            () => launchViewer(finalPage),
+                            () => launchViewer(1)
+                        );
+                    } else {
+                        // Fallback
+                        if (confirm(`Resume "${name}" from page ${finalPage}? Click Cancel to start over.`)) {
+                            launchViewer(finalPage);
+                        } else {
+                            launchViewer(1);
+                        }
+                    }
+                } else {
+                    // First time or page 1 -> Direct Open
+                    launchViewer(1);
+                }
+            });
+        }
+    };
+
+    window.saveAudioProgress = async function (bookName, time, duration, forceReset = false, syncCloud = true) {
+        const libKey = getUserKey('efv_digital_library');
+        const library = JSON.parse(localStorage.getItem(libKey)) || [];
+        const index = library.findIndex(i => i.name === bookName);
+
+        if (index !== -1) {
+            const isDone = forceReset || (duration > 0 && time / duration >= 0.95);
+            const finalTime = isDone ? 0 : time;
+
+            library[index].lastPlayedTime = finalTime;
+            library[index].totalDuration = duration;
+            localStorage.setItem(libKey, JSON.stringify(library));
+
+            // Only update UI if we are on the profile page or sidebar is open
+            // This is fast so we can call it frequently
+            updateLibraryDisplay(currentPlayingName);
+
+            if (!syncCloud) return;
+
+            const user = JSON.parse(localStorage.getItem('efv_user'));
+            if (user && user.email && library[index].id) {
+                try {
+                    const demoToken = btoa(user.email);
+                    await fetch('http://localhost:5000/api/demo/progress', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${demoToken}`
+                        },
+                        body: JSON.stringify({
+                            productId: library[index].id,
+                            progress: finalTime,
+                            total: duration
+                        })
+                    });
+                } catch (e) {
+                    console.warn('Audio sync failed', e);
+                }
+            }
+        }
+    };
+
+    window.saveEbookProgress = async function (bookName, page) {
+        // 1. Local Storage Update (Immediate Feedback)
+        const libKey = getUserKey('efv_digital_library');
+        const library = JSON.parse(localStorage.getItem(libKey)) || [];
+        const index = library.findIndex(i => i.name === bookName);
+
+        if (index !== -1) {
+            library[index].progress = page;
+            localStorage.setItem(libKey, JSON.stringify(library));
+            updateLibraryDisplay();
+        }
+
+        // 2. Backend Sync (Silent)
+        const user = JSON.parse(localStorage.getItem('efv_user'));
+        if (user && user.email) {
+            try {
+                // Use Name as ID for now or find the ID map
+                // In demo.js we use productId, but frontend only has name easily available in this context
+                // We'll try to find the ID from the library object
+                let productId = null;
+                if (index !== -1 && library[index].id) {
+                    productId = library[index].id;
+                } else {
+                    // Fallback map if needed, or send name as ID (backend needs to handle it)
+                    // For now, we assume library has ID
+                }
+
+                if (productId) {
+                    const demoToken = btoa(user.email);
+                    console.log(`📤 Syncing to backend: ${productId} -> Page ${page}`);
+                    const res = await fetch('http://localhost:5000/api/demo/progress', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${demoToken}`
+                        },
+                        body: JSON.stringify({
+                            productId: productId,
+                            progress: page,
+                            total: 0
+                        })
+                    });
+                    const data = await res.json();
+                    console.log('✅ Backend Response:', data);
+                }
+            } catch (error) {
+                console.warn('❌ Backend progress sync failed:', error);
+            }
+        }
+
+        // 3. UI Feedback
+        const btn = document.getElementById('save-bookmark-btn');
+        if (btn) {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Saved';
+            btn.style.background = '#10b981';
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.style.background = '';
+            }, 2000);
+        }
+    };
+
+    // Secure PDF Viewer (In-App)
+    function openPdfViewer(url, title, startPage = 1) {
+        console.log("PDF Viewer requested for:", url);
+
+        // Remove existing viewer if any
+        const existing = document.getElementById('pdf-viewer-modal');
+        if (existing) existing.remove();
+
+        // Inject Styles if not present
+        if (!document.getElementById('pdf-viewer-styles')) {
+            const style = document.createElement('style');
+            style.id = 'pdf-viewer-styles';
+            style.innerHTML = `
+                #pdf-viewer-modal {
+                    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+                    background: rgba(0,0,0,0.95); z-index: 20000; display: flex;
+                    align-items: center; justify-content: center;
+                    animation: fadeIn 0.3s ease-out;
+                }
+                .pdf-card {
+                    width: 95%; height: 95%; background: #111; border: 1px solid #ffd700;
+                    border-radius: 12px; display: flex; flex-direction: column; overflow: hidden;
+                    box-shadow: 0 0 50px rgba(0,0,0,0.8); position: relative;
+                }
+                .pdf-close-btn {
+                    position: absolute; top: 15px; right: 15px; width: 40px; height: 40px;
+                    background: rgba(255,0,0,0.2); border: 1px solid red; border-radius: 50%;
+                    color: white; display: flex; align-items: center; justify-content: center;
+                    cursor: pointer; z-index: 100; font-size: 1.2rem; transition: all 0.3s;
+                }
+                .pdf-close-btn:hover {
+                    background: rgba(255,0,0,0.5); transform: scale(1.1);
+                }
+                #pdf-viewer-container { 
+                    flex: 1; width: 100%; height: 100%; 
+                    user-select: none; -webkit-user-select: none; -moz-user-select: none;
+                }
+                #pdf-viewer-container::-webkit-scrollbar {
+                    width: 8px;
+                }
+                #pdf-viewer-container::-webkit-scrollbar-track {
+                    background: #222;
+                }
+                #pdf-viewer-container::-webkit-scrollbar-thumb {
+                    background: var(--gold-energy);
+                    border-radius: 4px;
+                }
+                .pdf-page-canvas {
+                    display: block;
+                    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+                    border-radius: 4px;
+                    max-width: 100%;
+                    height: auto;
+                    user-select: none;
+                    -webkit-user-select: none;
+                    -moz-user-select: none;
+                    pointer-events: none; /* Prevent right-click on canvas */
+                }
+                #pdf-sync-status.active {
+                    opacity: 1 !important;
+                }
+                @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+                
+                /* Security Notice */
+                .pdf-security-notice {
+                    position: absolute;
+                    bottom: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(255, 0, 0, 0.1);
+                    border: 1px solid rgba(255, 0, 0, 0.3);
+                    padding: 5px 15px;
+                    border-radius: 20px;
+                    font-size: 0.75rem;
+                    color: #ff6b6b;
+                    opacity: 0.6;
+                    pointer-events: none;
+                    z-index: 50;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Enhanced Viewer HTML with Controls
+        const viewerHTML = `
+            <div id="pdf-viewer-modal">
+                <div class="pdf-card">
+                    <button id="close-pdf-viewer" class="pdf-close-btn"><i class="fas fa-times"></i></button>
+                    <div style="padding: 10px; text-align: center; color: #ffd700; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin:0;">${title}</h3>
+                        <div id="pdf-controls-area" style="display: flex; gap: 10px; align-items: center;">
+                            <span style="font-size: 0.9rem; opacity: 0.8;">Page <span id="current-page-num">1</span></span>
+                            <button id="save-bookmark-btn" style="background: var(--gold-energy); color: black; border: none; padding: 5px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.85rem;">
+                                <i class="fas fa-bookmark"></i> Save Progress
+                            </button>
+                            <span id="pdf-sync-status" style="color: #10b981; font-size: 0.8rem; opacity: 0; transition: opacity 0.3s;">✓ Saved</span>
+                        </div>
+                    </div>
+                    <div id="pdf-main-loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ffd700; text-align: center; z-index: 10;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <p>Loading Secure Content...</p>
+                    </div>
+                    <div id="pdf-viewer-container" style="position: relative; background: #1a1a1a; overflow-y: auto; flex: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                        <!-- PDF pages will be rendered here as canvases -->
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', viewerHTML);
+
+        const modal = document.getElementById('pdf-viewer-modal');
+
+        // Close Handler
+        const cleanup = () => {
+            if (modal) modal.remove();
+            deactivateSecurityShield();
+        };
+
+        document.getElementById('close-pdf-viewer').onclick = cleanup;
+        modal.onclick = (e) => { if (e.target === modal) cleanup(); };
+
+        // Manual Bookmark Save
+        const bookmarkBtn = document.getElementById('save-bookmark-btn');
+        if (bookmarkBtn) {
+            bookmarkBtn.onclick = () => {
+                const currentPageNum = document.getElementById('current-page-num');
+                if (currentPageNum) {
+                    const page = parseInt(currentPageNum.textContent) || 1;
+                    window.saveEbookProgress(title, page);
+                }
+            };
+        }
+
+        activateSecurityShield();
+
+        // INTERNAL FALLBACK FUNCTION - Now using PDF.js instead of iframe
+        const fallbackToIframe = (pdfUrl) => {
+            // Don't use iframe anymore - use PDF.js for security
+            if (window.pdfjsLib) {
+                startPdfRendering(pdfUrl, title, startPage);
+            } else {
+                const container = document.getElementById('pdf-viewer-container');
+                container.innerHTML = `
+                    <div style="color: #ef4444; text-align: center; padding: 50px;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>PDF Library Not Loaded</h3>
+                        <p>Please refresh the page to load the secure viewer.</p>
+                    </div>
+                `;
+            }
+        };
+
+        // ALWAYS use PDF.js for security (no iframe)
+        console.log('🔍 PDF Viewer Debug:');
+        console.log('  - PDF.js Library loaded:', !!window.pdfjsLib);
+        console.log('  - PDF URL:', url);
+        console.log('  - Start Page:', startPage);
+
+        if (window.pdfjsLib) {
+            console.log('✅ Starting PDF.js rendering...');
+            startPdfRendering(url, title, startPage);
+        } else {
+            console.error('❌ PDF.js library NOT loaded!');
+            // Fallback if PDF.js didn't load
+            const container = document.getElementById('pdf-viewer-container');
+            container.innerHTML = `
+                <div style="color: #ef4444; text-align: center; padding: 50px;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                    <h3>PDF Library Not Loaded</h3>
+                    <p>Please refresh the page (Ctrl+R) and try again.</p>
+                    <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 20px;">If issue persists, check browser console (F12) for errors.</p>
+                </div>
+            `;
+            // Retry after delay
+            setTimeout(() => {
+                if (window.pdfjsLib) {
+                    console.log('✅ PDF.js loaded after retry');
+                    startPdfRendering(url, title, startPage);
+                } else {
+                    console.error('❌ PDF.js still not loaded after retry');
+                }
+            }, 1000);
+        }
+    }
+
+    function startPdfRendering(url, title, startPage) {
+        console.log('📄 startPdfRendering called with:', { url, title, startPage });
+
+        const pdflib = window.pdfjsLib;
+        if (!pdflib) {
+            console.error('❌ PDF.js library not available in startPdfRendering');
+            return;
+        }
+
+        pdflib.GlobalWorkerOptions.workerSrc = 'js/pdfjs/pdf.worker.min.js';
+        console.log('✅ PDF.js worker configured');
+
+        const container = document.getElementById('pdf-viewer-container');
+        const loader = document.getElementById('pdf-main-loader');
+        const pageNumDisplay = document.getElementById('current-page-num');
+        const syncStatus = document.getElementById('pdf-sync-status');
+
+        console.log('📦 Loading PDF from:', url);
+        const loadingTask = pdflib.getDocument(url);
+
+        loadingTask.promise.then(pdf => {
+            console.log('✅ PDF loaded successfully! Pages:', pdf.numPages);
+            if (loader) loader.style.display = 'none';
+            const numPages = pdf.numPages;
+            let pageHeights = new Array(numPages).fill(0);
+            let cumulativeHeights = [0];
+            let pagesLoaded = 0;
+
+            // 1. Pre-create canvases to preserve order
+            for (let i = 1; i <= numPages; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.className = 'pdf-page-canvas';
+                canvas.id = `pdf-page-${i}`;
+                canvas.style.marginBottom = '20px';
+                container.appendChild(canvas);
+
+                pdf.getPage(i).then(page => {
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    page.render(renderContext).promise.then(() => {
+                        console.log(`✅ Page ${i} rendered`);
+                        pageHeights[i - 1] = canvas.offsetHeight + 20;
+                        pagesLoaded++;
+
+                        // Only proceed with height-dependent logic when ALL pages are ready
+                        if (pagesLoaded === numPages) {
+                            console.log('✅ All pages rendered. Calculating offsets...');
+                            cumulativeHeights = [0];
+                            for (let j = 0; j < numPages; j++) {
+                                cumulativeHeights[j + 1] = cumulativeHeights[j] + pageHeights[j];
+                            }
+
+                            // Initial scroll to startPage
+                            if (startPage > 1 && startPage <= numPages) {
+                                container.scrollTop = cumulativeHeights[startPage - 1];
+                            }
+                            console.log('✅ PDF Viewer fully initialized.');
+                        }
+                    }).catch(err => console.error(`❌ Render Error Pg ${i}:`, err));
+                }).catch(err => console.error(`❌ Load Error Pg ${i}:`, err));
+            }
+
+            // 2. Real-time Auto-page detection logic
+            let saveTimeout;
+            container.addEventListener('scroll', () => {
+                const scrollTop = container.scrollTop;
+                const canvases = container.querySelectorAll('.pdf-page-canvas');
+                let detectedPage = 1;
+
+                // Identify page based on scroll position
+                canvases.forEach((cv, idx) => {
+                    // offsetTop is relative to container since container has padding/scroll
+                    if (scrollTop >= (cv.offsetTop - container.offsetTop - 200)) {
+                        detectedPage = idx + 1;
+                    }
+                });
+
+                if (detectedPage !== parseInt(pageNumDisplay.textContent)) {
+                    if (pageNumDisplay) pageNumDisplay.textContent = detectedPage;
+                }
+
+                // Debounced Auto-Save
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    console.log(`⏱ Debounced save triggered for Pg ${detectedPage}`);
+                    if (syncStatus) syncStatus.classList.add('active');
+                    window.saveEbookProgress(title, detectedPage);
+                    setTimeout(() => {
+                        if (syncStatus) syncStatus.classList.remove('active');
+                    }, 1500);
+                }, 1500);
+            });
+
+        }).catch(err => {
+            console.error('❌ PDF Load Error:', err);
+            console.error('   Error name:', err.name);
+            console.error('   Error message:', err.message);
+            console.error('   Attempted URL:', url);
+
+            if (loader) {
+                loader.innerHTML = `
+                    <div style="color:#ef4444; text-align: center;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 20px;"></i>
+                        <h3>Error Loading PDF</h3>
+                        <p>${err.message}</p>
+                        <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 20px;">
+                            Path: ${url}
+                        </p>
+                        <button onclick="location.reload()" style="margin-top: 20px; background: var(--gold-energy); color: black; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            Refresh Page
+                        </button>
+                    </div>
+                `;
+            }
+        });
+    }
+
+    // Toggle User Profile View (Redirect to Dashboard)
+    function toggleUserProfile(show) {
+        if (show) {
+            window.location.href = 'profile.html';
+        }
+    }
+
+    function loadRazorpayScript() {
+        return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    }
+
+    // Event Listeners
+    async function checkoutOrder(itemsOverride = null) {
+        const user = JSON.parse(localStorage.getItem('efv_user'));
+        if (!user || applySecurityToken(user.email) === null) {
+            openAuthModal('login');
+            return;
+        }
+
+        const itemsToProcess = itemsOverride || cart;
+
+        if (itemsToProcess.length === 0) {
+            alert('Your cart is empty.');
+            return;
+        }
+
+        const totalAmount = itemsToProcess.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        const btn = document.getElementById('checkout-btn');
+        const originalText = btn?.textContent || 'Checkout';
+        if (btn) {
+            btn.textContent = 'Initializing Payment...';
+            btn.disabled = true;
+        }
+
+        try {
+            // Deactivate security shield during checkout to allow input and focus
+            if (typeof deactivateSecurityShield === 'function') deactivateSecurityShield();
+
+            // 1. Load Razorpay SDK
+            const isLoaded = await loadRazorpayScript();
+            if (!isLoaded) {
+                alert('Razorpay SDK failed to load.');
+                if (btn) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+                return;
+            }
+
+            // 2. Create Razorpay Order via Backend
+            const rzpRes = await fetch('http://localhost:5000/api/orders/razorpay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: totalAmount })
+            });
+            const rzpOrderData = await rzpRes.json();
+
+            if (!rzpRes.ok) throw new Error(rzpOrderData.message || 'Failed to create payment order');
+
+            // 3. Open Razorpay Modal
+            const options = {
+                key: 'rzp_live_SBFlInxBiRfOGd',
+                amount: rzpOrderData.amount,
+                currency: rzpOrderData.currency,
+                name: 'EFV Energy Frequency Vibration',
+                description: 'Digital/Physical Purchase',
+                order_id: rzpOrderData.id,
+                prefill: {
+                    name: user.name || 'User',
+                    email: user.email
+                },
+                theme: { color: '#FFD369' },
+                modal: {
+                    ondismiss: function () {
+                        if (btn) {
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        }
+                    }
+                },
+                handler: async function (response) {
+                    if (btn) btn.textContent = 'Verifying Payment...';
+
+                    try {
+                        const verifyRes = await fetch('http://localhost:5000/api/orders/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                customer: {
+                                    name: user.name || 'Customer',
+                                    email: user.email,
+                                    address: '123 EFV St, Meta City'
+                                },
+                                items: itemsToProcess.map(item => ({
+                                    productId: item.id,
+                                    quantity: item.quantity
+                                }))
+                            })
+                        });
+
+                        const data = await verifyRes.json();
+
+                        if (verifyRes.ok) {
+                            // Fulfill Order
+                            const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
+                            const trackingUrl = `${baseUrl}/tracking.html?id=${data.order._id}`;
+
+                            if (confirm(`✅ Payment Successful!\n\nOrder ID: ${data.order.orderId}\n\nClick OK to track your order.`)) {
+                                window.location.href = trackingUrl;
+                            }
+
+                            const purchasedItems = [...itemsToProcess];
+                            if (!itemsOverride) {
+                                cart = [];
+                                localStorage.setItem('efv_cart', JSON.stringify(cart));
+                                updateCartUI();
+                            }
+                            toggleUserProfile(true);
+                            toggleCart(true);
+
+                            if (window.location.protocol !== 'file:') {
+                                syncLibraryWithBackend().catch(err => console.error('Sync failed:', err));
+                            }
+
+                            // Manual Library Update
+                            purchasedItems.forEach(async (item) => {
+                                const isDigital = item.id.includes('audio') || item.id.includes('ebook');
+                                if (isDigital) {
+                                    const libKey = getUserKey('efv_digital_library');
+                                    let currentLibrary = JSON.parse(localStorage.getItem(libKey)) || [];
+                                    if (!currentLibrary.some(l => l.id === item.id)) {
+                                        currentLibrary.push({
+                                            id: item.id,
+                                            name: item.name,
+                                            type: item.id.includes('audio') ? 'Audiobook' : 'E-Book',
+                                            date: new Date().toLocaleDateString()
+                                        });
+                                        localStorage.setItem(libKey, JSON.stringify(currentLibrary));
+
+                                        const demoToken = btoa(user.email);
+                                        await fetch('http://localhost:5000/api/demo/add-to-library', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': `Bearer ${demoToken}`
+                                            },
+                                            body: JSON.stringify({ productId: item.id })
+                                        }).catch(e => console.error('Library Sync Error:', e));
+                                    }
+                                }
+
+                                const historyKey = getUserKey('efv_purchase_history');
+                                let currentHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
+                                const existing = currentHistory.find(h => h.name === item.name);
+                                if (existing) existing.quantity += item.quantity;
+                                else currentHistory.push({ name: item.name, price: item.price, quantity: item.quantity, date: new Date().toLocaleDateString() });
+                                localStorage.setItem(historyKey, JSON.stringify(currentHistory));
+                            });
+
+                            if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
+                            if (typeof updateHistoryDisplay === 'function') updateHistoryDisplay();
+                        } else {
+                            alert(`Verification Failed: ${data.message}`);
+                        }
+                    } catch (e) {
+                        alert('Verification Error: ' + e.message);
+                    } finally {
+                        if (btn) {
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        }
+                    }
+                },
+                modal: {
+                    ondismiss: function () {
+                        if (btn) {
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        }
+                    }
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function (resp) {
+                alert(`Payment Failed: ${resp.error.description}`);
+                if (btn) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
+            // Close Cart Panel to focus on Razorpay
+            const cartPanel = document.getElementById('cart-panel');
+            const cartBackdrop = document.querySelector('.cart-backdrop');
+            if (cartPanel) cartPanel.classList.remove('active');
+            if (cartBackdrop) cartBackdrop.classList.remove('active');
+
+            rzp.open();
+
+        } catch (error) {
+            console.error('Checkout Error:', error);
+            alert(`Checkout Error: ${error.message}`);
+            if (btn) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+    }
+
+    // Helper to simulate token check or basic validation
+    function applySecurityToken(email) {
+        return email ? btoa(email) : null;
+    }
+
+    // Update Event Listener
+    if (checkoutBtn) {
+        checkoutBtn.addEventListener('click', () => {
+            const user = JSON.parse(localStorage.getItem('efv_user'));
+            if (user) {
+                showTermsAndConditions(() => {
+                    checkoutOrder();
+                });
+            } else {
+                openAuthModal('signup');
+            }
+        });
+    }
+    if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
+    if (signupBtn) signupBtn.addEventListener('click', () => openAuthModal('signup'));
+    if (closeAuthModal) closeAuthModal.addEventListener('click', closeAuth);
+
+    if (tabLogin) tabLogin.addEventListener('click', () => switchTab('login'));
+    if (tabSignup) tabSignup.addEventListener('click', () => switchTab('signup'));
+
+    // Simulate Form Submission
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = loginForm.querySelector('input[type="email"]').value.trim().toLowerCase();
+            const password = loginForm.querySelector('input[type="password"]').value.trim();
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+
+            // UI Feedback
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Logging in...';
+            submitBtn.disabled = true;
+
+            try {
+                // Admin Credentials Check (Client-side bypass for demo/admin)
+                if (email === 'admin@uwo24.com' && password === 'uwo@1234') {
+                    // ... (existing admin logic)
+                    sessionStorage.setItem('adminLoggedIn', 'true');
+                    localStorage.setItem('efv_user', JSON.stringify({ name: 'ADMIN', email: email }));
+                    // Admin might not need token for frontend demos, but if backend requires it, we should login via API too.
+                    // For now, keep legacy admin as is.
+                    if (window.updateAdminNavbar) window.updateAdminNavbar();
+                    closeAuth();
+                    toggleUserProfile(true);
+                    toggleCart(true);
+                    return;
+                }
+
+                // API Login
+                const response = await fetch('http://localhost:5000/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Login failed');
+                }
+
+                // Success
+                localStorage.setItem('efv_token', data.token);
+                localStorage.setItem('efv_user', JSON.stringify({
+                    name: data.name,
+                    email: data.email,
+                    role: data.role,
+                    _id: data._id
+                }));
+
+                closeAuth();
+                toggleUserProfile(true);
+                toggleCart(true);
+
+                // Sync library
+                syncLibraryWithBackend().catch(err => console.error('Background sync failed:', err));
+
+                // Optional: Reload if on profile page or to refresh state
+                if (window.location.pathname.includes('profile.html')) {
+                    window.location.reload();
+                } else if (!window.location.pathname.includes('index.html') && !window.location.pathname.includes('marketplace.html')) {
+                    // Maybe redirect to profile if not on main pages?
+                    window.location.href = 'profile.html';
+                }
+
+            } catch (error) {
+                console.error('Login Error:', error);
+                alert(error.message);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    if (signupForm) {
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = signupForm.querySelector('input[type="text"]').value;
+            const email = signupForm.querySelector('input[type="email"]').value;
+            const password = signupForm.querySelector('input[type="password"]').value; // Need password input in HTML if not present, but assuming it is there based on read
+            const submitBtn = signupForm.querySelector('button[type="submit"]');
+
+            // UI Feedback
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Creating Account...';
+            submitBtn.disabled = true;
+
+            try {
+                // API Signup
+                const response = await fetch('http://localhost:5000/api/auth/signup', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Signup failed');
+                }
+
+                // Success
+                localStorage.setItem('efv_token', data.token);
+                localStorage.setItem('efv_user', JSON.stringify({
+                    name: data.name,
+                    email: data.email,
+                    _id: data._id
+                }));
+
+                closeAuth();
+                toggleUserProfile(true);
+                toggleCart(true);
+
+                // Sync library
+                syncLibraryWithBackend().catch(err => console.error('Background sync failed:', err));
+
+            } catch (error) {
+                console.error('Signup Error:', error);
+                alert(error.message);
+            } finally {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    }
+
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            // Stop Audio and Remove Shield if active
+            if (window.currentAudio) {
+                window.currentAudio.pause();
+                window.currentAudio = null;
+            }
+            if (typeof deactivateSecurityShield === 'function') deactivateSecurityShield();
+
+            sessionStorage.removeItem('adminLoggedIn');
+            localStorage.removeItem('efv_user');
+            localStorage.removeItem('efv_token'); // Clear auth token
+            localStorage.removeItem('efv_cart'); // Clear cart on logout for demo isolation
+
+            if (window.updateAdminNavbar) window.updateAdminNavbar();
+
+            // Re-initialize cart variable and UI
+            cart = [];
+            updateCartUI();
+
+            toggleUserProfile(false);
+
+            // Optional: Reload to ensure all states are clean
+            // window.location.reload();
+        });
+    }
+
+    // Initial State Check
+    if (localStorage.getItem('efv_user') || sessionStorage.getItem('adminLoggedIn') === 'true') {
+        // Fix for "Guest User" names in stored profiles
+        const storedUser = JSON.parse(localStorage.getItem('efv_user'));
+        if (storedUser && storedUser.name && (storedUser.name.toLowerCase() === 'guest user' || storedUser.name.toUpperCase() === 'GUEST USER' || storedUser.name === 'John Doe')) {
+            const nameFromEmail = storedUser.email.split('@')[0].charAt(0).toUpperCase() + storedUser.email.split('@')[0].slice(1);
+            storedUser.name = nameFromEmail;
+            localStorage.setItem('efv_user', JSON.stringify(storedUser));
+        }
+        // toggleUserProfile(true); // Removed to prevent loop
+        syncLibraryWithBackend(); // Initial sync
+    }
+
+    updateCartUI();
+});
+
+function showResumeOption(title, progressLabel, onResume, onRestart) {
+    // Remove existing
+    const existing = document.getElementById('resume-modal');
+    if (existing) existing.remove();
+
+    const isAudio = progressLabel.includes(':');
+    const icon = isAudio ? 'fa-headphones' : 'fa-bookmark';
+    const subTitle = isAudio ? 'Continue Listening?' : 'Resume Reading?';
+    const labelPrefix = isAudio ? 'You left off at' : 'You left at';
+    const labelSuffix = isAudio ? 'in the audio' : `Page ${progressLabel}`;
+
+    const html = `
+    <div id="resume-modal" class="modal-overlay active" style="z-index: 30000; display: flex; align-items: center; justify-content: center; animation: fadeIn 0.4s ease-out;">
+        <div class="modal-card" style="max-width: 400px; width: 90%; text-align: center; border: 1px solid var(--gold-energy); box-shadow: 0 0 30px rgba(255, 211, 105, 0.2); background: #111; padding: 30px; border-radius: 12px; position: relative;">
+            <div style="font-size: 3rem; color: var(--gold-energy); margin-bottom: 20px;">
+                <i class="fas ${icon}"></i>
+            </div>
+            <h3 style="margin-bottom: 10px; color: white; font-family: 'Cinzel', serif;">${subTitle}</h3>
+            <p style="opacity: 0.8; margin-bottom: 25px; color: #ccc;">${labelPrefix} <strong>${title}</strong> at <span class="gold-text">${isAudio ? progressLabel : labelSuffix}</span>.</p>
+            
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                <button id="resume-btn" style="flex: 1; min-width: 140px; padding: 12px; background: var(--gold-energy); color: black; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif;">
+                    <i class="fas fa-play"></i> CONTINUE
+                </button>
+                <button id="restart-btn" style="flex: 1; min-width: 140px; padding: 12px; background: transparent; color: var(--gold-energy); border: 1px solid var(--gold-energy); border-radius: 6px; font-weight: bold; cursor: pointer; font-family: 'Cinzel', serif;">
+                    <i class="fas fa-redo"></i> START OVER
+                </button>
+            </div>
+            <div style="margin-top: 20px;">
+                 <button id="resume-cancel" style="background: none; border: none; color: #666; cursor: pointer; text-decoration: underline; font-size: 0.9rem;">Cancel</button>
+            </div>
+        </div>
+    </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+
+    const modal = document.getElementById('resume-modal');
+    const resumeBtn = document.getElementById('resume-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const cancelBtn = document.getElementById('resume-cancel');
+
+    const close = () => modal.remove();
+
+    resumeBtn.onclick = () => { close(); onResume(); };
+    restartBtn.onclick = () => { close(); onRestart(); };
+    cancelBtn.onclick = close;
+}
+
+// Global beforeunload to save playing audio progress
+window.addEventListener('beforeunload', () => {
+    if (window.currentAudio && window.currentPlayingName) {
+        window.saveAudioProgress(window.currentPlayingName, window.currentAudio.currentTime, window.currentAudio.duration);
+    }
+});
+

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Frequency Vibration | Official Platform</title>
+
+    <!-- CSS Links -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="css/product-modal.css?v=13.0">
+    <style id="anti-blur-override">
+        /* Nuclear Fix: Force clear modal blur regardless of external CSS state */
+        .product-modal-card,
+        .product-modal-card *,
+        .product-modal-overlay,
+        .tc-card,
+        .tc-card *,
+        .tc-modal-overlay {
+            filter: none !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            transform: perspective(1px) scale(1) translateY(0) !important;
+            image-rendering: -webkit-optimize-contrast !important;
+            image-rendering: crisp-edges !important;
+        }
+
+        body.modal-open {
+            filter: none !important;
+        }
+    </style>
+
+    <!-- PDF.js Library for Secure In-App Viewer (Local) -->
+    <script src="js/pdfjs/pdf.min.js"></script>
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body data-page="home">
+    <!-- Global cosmic background will be initialized by particles.js -->
+    <div id="particles-js"></div>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="img/AISA.svg" alt="AISA Logo">
+                <span>EFV<sup>TM</sup></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html" class="active gold-text">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="Feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="javascript:void(0)" id="cart-toggle" class="cart-icon glass-panel"
+                    style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shopping-cart gold-text"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <button class="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="sacred-circle" style="opacity: 0.2;">
+            <div class="ring ring-outer"></div>
+            <div class="ring ring-mid"></div>
+            <div class="ring ring-inner"></div>
+        </div>
+
+        <div class="container" style="position: relative; z-index: 10;">
+            <div class="hero-content">
+                <h1 class="glow-pulse-text">
+                    Measure Your Alignment <br> <span class="gold-glow-text">Live in Flow</span>
+                </h1>
+                <p class="reveal active delay-1">
+                    EFV<sup>TM</sup> by UWO<sup>TM</sup> — the world’s first Alignment Intelligence system
+                    <br>
+                    designed to elevate your Energy, Frequency & Vibration.
+                </p>
+                <div class="hero-btns reveal active delay-2 float-ethereal">
+                    <a href="marketplace.html" class="btn btn-gold magnetic">Browse EFV<sup>TM</sup> Books</a>
+                    <span class="btn btn-outline" style="cursor: default; opacity: 0.7;">Get EFV<sup>TM</sup> APP
+                        (Coming Soon)</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- What is EFV<sup>TM</sup> -->
+    <section class="section" id="about">
+        <div class="container">
+            <div class="text-center mb-50">
+                <h2 class="slide-blur-in">What is <span class="gold-text">EFV<sup>TM</sup> ?</span></h2>
+                <p class="reveal" style="margin-top: 20px;">EFV<sup>TM</sup> helps you understand how your body and mind
+                    work together.<br>
+                    A system created by Mr. Gurumukh P. Ahuja that includes:</p>
+                <div class="wave-underline" style="margin: 20px auto; width: 60px;"></div>
+            </div>
+
+            <div class="grid-4" style="margin-top: 50px;">
+                <div class="glass-panel reveal magnetic text-center">
+                    <i class="fas fa-bolt gold-text" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3>Energy</h3>
+                    <p>Control and improve your daily energy levels.</p>
+                </div>
+                <div class="glass-panel reveal magnetic delay-1 text-center">
+                    <i class="fas fa-wave-square gold-text" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3>Frequency</h3>
+                    <p>Connect your feelings with your life goals.</p>
+                </div>
+                <div class="glass-panel reveal magnetic delay-2 text-center">
+                    <i class="fas fa-gem gold-text" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3>Vibration</h3>
+                    <p>Live in a natural state of flow and ease.</p>
+                </div>
+                <div class="glass-panel reveal magnetic delay-3 text-center">
+                    <i class="fas fa-leaf gold-text" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+                    <h3>Lifestyle</h3>
+                    <p>Simple daily habits for better performance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EFV<sup>TM</sup> Books -->
+    <section class="section" id="books" style="background: rgba(11, 19, 43, 0.2);">
+        <div class="container text-center">
+            <h2 class="slide-blur-in underline-draw">EFV<sup>TM</sup> Books <span class="gold-text">(Volume 1–9
+                    Series)</span></h2>
+            <p class="reveal" style="margin: 20px 0;">Volume 1 & 2 releasing this month.<br>9-volume transformational
+                system covering:</p>
+
+            <div id="books-topics" class="reveal"
+                style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 40px;">
+                <span class="glass-panel"
+                    style="padding: 10px 20px; border-radius: 50px; font-size: 0.8rem;">Alignment</span>
+                <span class="glass-panel"
+                    style="padding: 10px 20px; border-radius: 50px; font-size: 0.8rem;">Flow</span>
+                <span class="glass-panel" style="padding: 10px 20px; border-radius: 50px; font-size: 0.8rem;">Conscious
+                    Living</span>
+                <span class="glass-panel" style="padding: 10px 20px; border-radius: 50px; font-size: 0.8rem;">Energy
+                    Science</span>
+                <span class="glass-panel" style="padding: 10px 20px; border-radius: 50px; font-size: 0.8rem;">Emotional
+                    Frameworks</span>
+                <span class="glass-panel" style="padding: 10px 20px; border-radius: 50px; font-size: 0.8rem;">Meditation
+                    & Frequency Practices</span>
+            </div>
+
+            <div class="carousel-container reveal">
+                <button class="carousel-nav prev disabled" aria-label="Previous"><i
+                        class="fas fa-chevron-left"></i></button>
+                <div class="carousel-overflow">
+                    <div class="carousel-track" id="books-track">
+                        <!-- Volume 1 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol1-cover.png" alt="Volume 1 Cover" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid var(--gold-energy); box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+                            </div>
+                            <h3>ORIGIN CODE</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">A journey into the starting
+                                point of everything — where consciousness, energy, and existence begin. This volume lays
+                                the foundation for understanding how reality is formed.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Purchase
+                                Now</a>
+                        </div>
+
+                        <!-- Volume 2 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 2.png" alt="Volume 2" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #9b1b1b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>MINDOS™</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">An exploration of how thoughts
+                                and emotions shape our inner world. It breaks down the architecture of the human mind in
+                                a clear, practical way.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 3 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 3.png" alt="Volume 3" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #00e5ff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>UNIVERSAL ACTIVATION</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">A guide to awakening the
+                                untapped
+                                potential within you. It helps you recognize and activate the deeper frequencies that
+                                drive growth and clarity.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 4 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 4.png" alt="Volume 4" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #3867d6; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>RESONANCE BRIDGE</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">Bridges the gap between human
+                                awareness and universal intelligence. This volume shows how alignment creates flow,
+                                intuition, and meaningful synchronicity.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 5 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 5.png" alt="Volume 5" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #05c46b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>HUMAN OS™</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">A fresh look at the human
+                                operating system — how we think, decide, evolve, and build the future. It connects human
+                                consciousness with the next era of AI.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 6 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 6.png" alt="Volume 6" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #eb4d4b; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>EMOTIONOS™</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">Explains emotional intelligence
+                                as a powerful stabilizing force. It shows how emotional calibration creates harmony
+                                between humans and intelligent systems.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 7 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 7.jpeg" alt="Volume 7" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #1dd1a1; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>MEMORYOS™</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">Explores memory as the thread
+                                that holds identity together. It examines how continuity across time shapes who we are
+                                and who we become.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 8 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 8.png" alt="Volume 8" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #feca57; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>AGENTOS™</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">Unpacks the rise of autonomous
+                                intelligence and intelligent agents. A practical blueprint for understanding the
+                                agent-driven world ahead.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+
+                        <!-- Volume 9 -->
+                        <div class="glass-panel shine-box magnetic" style="display: flex; flex-direction: column;">
+                            <div class="book-cover"
+                                style="height: 320px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center;">
+                                <img src="img/vol 9.png" alt="Volume 9" loading="lazy"
+                                    style="height: 100%; width: auto; object-fit: contain; border-radius: 12px; border: 1px solid #ff4dff; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                            </div>
+                            <h3>GOVERNANCEOS™</h3>
+                            <p style="margin: 15px 0; opacity: 0.8; font-size: 0.9rem;">Focuses on ethics, alignment,
+                                and responsibility in an AI-powered civilization. It defines the principles that ensure
+                                technology evolves with wisdom.</p>
+                            <a href="marketplace.html" class="btn btn-outline"
+                                style="padding: 10px 15px; width: 100%; font-size: 0.8rem; margin-top: auto;">Coming
+                                Soon</a>
+                        </div>
+                    </div>
+                </div>
+                <button class="carousel-nav next" aria-label="Next"><i class="fas fa-chevron-right"></i></button>
+            </div>
+
+
+            <div style="text-align: center;">
+                <a href="marketplace.html" class="btn btn-gold reveal" style="margin-top: 60px;">Browse EFV<sup>TM</sup>
+                    Books</a>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- Why EFV<sup>TM</sup> Works -->
+    <section class="section" style="background: rgba(11, 19, 43, 0.2);">
+        <div class="container">
+            <div class="text-center mb-50">
+                <h2 class="slide-blur-in">Why EFV<sup>TM</sup> Works <span class="gold-text">(Science +
+                        Philosophy)</span></h2>
+                <div class="wave-underline" style="margin: 20px auto; width: 60px;"></div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 60px;">
+                <div class="glass-panel reveal text-center">
+                    <div class="glow-circle"
+                        style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--gold-energy); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 211, 105, 0.3);">
+                        <i class="fas fa-eye gold-text" style="font-size: 2rem;"></i>
+                    </div>
+                    <h3>Energy governs clarity</h3>
+                </div>
+                <div class="glass-panel reveal text-center">
+                    <div class="glow-circle"
+                        style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--gold-energy); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 211, 105, 0.3);">
+                        <i class="fas fa-heart gold-text" style="font-size: 2rem;"></i>
+                    </div>
+                    <h3>Frequency shapes emotions</h3>
+                </div>
+                <div class="glass-panel reveal text-center">
+                    <div class="glow-circle"
+                        style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--gold-energy); margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(255, 211, 105, 0.3);">
+                        <i class="fas fa-compass gold-text" style="font-size: 2rem;"></i>
+                    </div>
+                    <h3>Vibration influences decisions</h3>
+                </div>
+            </div>
+            <p class="reveal text-center"
+                style="margin-top: 40px; font-style: italic; opacity: 0.8; text-align: center;">EFV<sup>TM</sup>
+                helps you
+                align all three — daily.</p>
+        </div>
+    </section>
+
+
+    <!-- Final CTA Section -->
+    <section class="section text-center" style="position: relative; overflow: hidden;">
+        <div class="container reveal">
+            <h2 style="font-size: clamp(2.5rem, 5vw, 4rem); margin-bottom: 30px;" class="scale-fade-in">Begin Your <span
+                    class="gold-glow-text">Alignment Journey</span></h2>
+            <div class="hero-btns delay-1"
+                style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-top: 50px;">
+                <a href="marketplace.html" class="btn btn-outline magnetic">Read EFV<sup>TM</sup> Books</a>
+                <a href="contact.html" class="btn btn-outline magnetic">Join EFV<sup>TM</sup> App Watchlist</a>
+                <a href="marketplace.html" class="btn btn-outline magnetic">Explore EFV<sup>TM</sup> Lifestyle</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-links footer-explore">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="about.html">About EFV<sup>TM</sup></a></li>
+                        <li><a href="uwo.html">About UWO<sup>TM</sup></a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="preview.html">Preview</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="Feedback.html">Feedback</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-info">
+                    <div class="logo footer-logo">
+                        <img src="img/AISA.svg" alt="AISA Logo">
+                        <span>EFV<sup>TM</sup></span>
+                    </div>
+                    <p>World's first EFV<sup>TM</sup> system. Designed for better living.</p>
+                </div>
+                <div class="footer-links footer-connect">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61585343488735" class="social-icon-link"
+                            aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <img src="img/FB.svg" alt="Facebook"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="https://www.instagram.com/efv_framework/" class="social-icon-link"
+                            aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Insta (1).svg" alt="Instagram"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="https://www.linkedin.com/in/efv-framework/" class="social-icon-link"
+                            aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Linkedin.svg" alt="LinkedIn"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="https://www.threads.com/@efv_framework" class="social-icon-link" aria-label="Threads"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/Threads.svg" alt="Threads"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="https://x.com/EfvFrame_work" class="social-icon-link" aria-label="X (Twitter)"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/x.png" alt="X (Twitter)"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="#" class="social-icon-link" aria-label="YouTube" target="_blank"
+                            rel="noopener noreferrer">
+                            <img src="img/YT (1).svg" alt="YouTube"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="https://in.pinterest.com/EFV_Framework/" class="social-icon-link"
+                            aria-label="Pinterest" target="_blank" rel="noopener noreferrer">
+                            <img src="img/pinterset.png" alt="Pinterest" style="width: 26px; height: 26px;">
+                        </a>
+                        <a href="mailto:admin@uwo24.com" class="social-icon-link" aria-label="Gmail">
+                            <img src="img/gmail.png" alt="Gmail" style="width: 26px; height: 26px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; UWO<sup>TM</sup> — EFV<sup>TM</sup> is a UWO<sup>TM</sup> Innovation.
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS Scripts -->
+    <script src="js/particles.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/productsData.js?v=22.0"></script>
+    <script src="js/cart.js?v=22.0"></script>
+    <script src="js/chatbot.js?v=9.0"></script>
+</body>
+
+</html>

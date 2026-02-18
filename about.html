@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | EFV™ – Energy Frequency Vibration</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/chatbot.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px 0;
+        }
+
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background: var(--gold-energy);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -1px;
+            box-shadow: 0 0 10px var(--gold-energy);
+        }
+
+        .timeline-item {
+            padding: 10px 40px;
+            position: relative;
+            width: 50%;
+            transition: var(--transition);
+        }
+
+        .timeline-item.left {
+            left: 0;
+            text-align: right;
+        }
+
+        .timeline-item.right {
+            left: 50%;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background: var(--gold-energy);
+            border-radius: 50%;
+            top: 15px;
+            z-index: 1;
+            box-shadow: 0 0 15px var(--gold-energy);
+        }
+
+        .timeline-item.right::after {
+            left: -10px;
+        }
+
+        @media (max-width: 768px) {
+            .timeline::after {
+                left: 31px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                padding-left: 70px;
+                padding-right: 20px;
+            }
+
+            .timeline-item.left,
+            .timeline-item.right {
+                left: 0;
+                text-align: left !important;
+            }
+
+            .timeline-item.left::after,
+            .timeline-item.right::after {
+                left: 21px;
+            }
+        }
+    </style>
+</head>
+
+<body data-page="about">
+    <div id="particles-js"></div>
+
+    <nav>
+        <div class="container">
+            <a href="index.html" class="logo">
+                <img src="img/AISA.svg" alt="AISA Logo">
+                <span>EFV<sup>TM</sup></span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html" class="active gold-text">About</a></li>
+                <li><a href="gallery.html">Gallery</a></li>
+                <li><a href="marketplace.html">Marketplace</a></li>
+                <li><a href="Feedback.html">Feedback</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+            <div class="nav-actions">
+                <a href="javascript:void(0)" id="cart-toggle" class="cart-icon glass-panel"
+                    style="padding: 10px 15px; text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-shopping-cart gold-text"></i>
+                    <span id="cart-count">0</span>
+                </a>
+                <button class="hamburger" aria-label="Menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="section text-center"
+        style="padding-top: 120px; padding-bottom: 40px; position: relative; overflow: hidden;">
+        <div class="lotus-container">
+            <div class="lotus-petal"></div>
+            <div class="lotus-petal"></div>
+            <div class="lotus-petal"></div>
+        </div>
+        <div class="container reveal active">
+
+
+        </div>
+    </header>
+
+    <section class="section">
+        <div class="container">
+            <!-- Row 1: About UWO -->
+            <div class="grid-2 branding-section" style="align-items: center; margin-bottom: 80px;">
+                <div class="reveal branding-text" style="text-align: left;">
+                    <h2 class="gold-text slide-blur-in" style="text-align: center;">About UWO<sup>TM</sup></h2>
+                    <div class="wave-underline" style="margin: 0 auto 20px auto;"></div>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px; display: flex; align-items: start; gap: 15px;">
+                            <i class="fas fa-globe gold-text" style="margin-top: 5px;"></i>
+                            <span><strong>Universal Wellness Organization:</strong> A next-generation
+                                human-transformation company building wellness, technology, and lifestyle
+                                solutions.</span>
+                        </li>
+                        <li style="margin-bottom: 12px; display: flex; align-items: start; gap: 15px;">
+                            <i class="fas fa-bullseye gold-text" style="margin-top: 5px;"></i>
+                            <span><strong>Our Mission:</strong> Providing tools and ecosystems to measure and elevate
+                                consciousness through Alignment Intelligence.</span>
+                        </li>
+                    </ul>
+                </div>
+                <!-- UWO Logo without card container -->
+                <div class="reveal branding-logo" style="display: flex; align-items: center; justify-content: center;">
+                    <img src="img/image.png" alt="UWO Logo" class="revolving-logo"
+                        style="width: 350px; filter: drop-shadow(0 0 50px rgba(0, 212, 255, 0.4)); transform: scale(1.2);"
+                        loading="lazy">
+                </div>
+            </div>
+
+            <!-- Row 2: About EFV -->
+            <div class="grid-2 branding-section" style="align-items: center;">
+                <!-- EFV Logo on the Left -->
+                <div class="reveal branding-logo" style="display: flex; align-items: center; justify-content: center;">
+                    <img src="img/AISA.svg" alt="EFV Logo" class="revolving-logo"
+                        style="width: 350px; filter: drop-shadow(0 0 50px rgba(255, 184, 0, 0.4)); transform: scale(1.2);">
+                </div>
+
+                <!-- EFV Text on the Right -->
+                <div class="reveal branding-text" style="text-align: left; padding-left: 50px;">
+                    <h2 class="gold-text slide-blur-in" style="text-align: center;">About EFV<sup>TM</sup></h2>
+                    <div class="wave-underline" style="margin: 0 auto 20px auto;"></div>
+                    <p style="margin-bottom: 15px;">
+                        EFV<sup>TM</sup> (Energy Frequency Vibration) is the core philosophical and technological
+                        framework designed by Mr. Gurumukh P. Ahuja. It decodes the fundamental forces that govern human
+                        potential:
+                    </p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 12px; display: flex; align-items: start; gap: 15px;">
+                            <i class="fas fa-bolt gold-text" style="margin-top: 5px;"></i>
+                            <span><strong>Energy:</strong> Control your energy for better daily performance and
+                                health.</span>
+                        </li>
+                        <li style="margin-bottom: 12px; display: flex; align-items: start; gap: 15px;">
+                            <i class="fas fa-wave-square gold-text" style="margin-top: 5px;"></i>
+                            <span><strong>Frequency:</strong> Connect your feelings with your life's goals.</span>
+                        </li>
+                        <li style="margin-bottom: 12px; display: flex; align-items: start; gap: 15px;">
+                            <i class="fas fa-gem gold-text" style="margin-top: 5px;"></i>
+                            <span><strong>Vibration:</strong> Live in a state of flow and clear thinking.</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section" style="background: rgba(11, 19, 43, 0.2);">
+        <div class="container text-center">
+            <h2 class="gold-text slide-blur-in" style="text-align: center;">About the Founder</h2>
+            <div class="wave-underline" style="margin: 0 auto 20px auto;"></div>
+            <div class="reveal" style="margin: 40px auto; max-width: 800px;">
+                <h3 style="margin-bottom: 20px;">Mr. Gurumukh P. Ahuja</h3>
+                <p>Founder and Author of EFV<sup>TM</sup>.<br>Creator of the 9-Volume EFV<sup>TM</sup> Series and
+                    wellness system.</p>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <div class="timeline-item left reveal magnetic">
+                    <div class="glass-panel shine-box">
+                        <h4 class="gold-text">The Vision</h4>
+                        <p style="opacity: 0.8; margin-top: 10px;">The start of our books and the main system.</p>
+                    </div>
+                </div>
+                <div class="timeline-item right reveal magnetic delay-1">
+                    <div class="glass-panel shine-box">
+                        <h4 class="gold-text">The Mission</h4>
+                        <p style="opacity: 0.8; margin-top: 10px;">To measure and elevate human alignment through the
+                            Integration of Technology and Frequency.</p>
+                    </div>
+                </div>
+                <div class="timeline-item left reveal magnetic delay-2">
+                    <div class="glass-panel shine-box">
+                        <h4 class="gold-text">UWO<sup>TM</sup> Foundation</h4>
+                        <p style="opacity: 0.8; margin-top: 10px;">Establishing the Universal Wellness Organization.</p>
+                    </div>
+                </div>
+                <div class="timeline-item right reveal magnetic delay-3">
+                    <div class="glass-panel shine-box">
+                        <h4 class="gold-text">Global Launch</h4>
+                        <p style="opacity: 0.8; margin-top: 10px;">Bringing Alignment Intelligence to the
+                            world.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <div class="logo footer-logo">
+                        <img src="img/AISA.svg" alt="AISA Logo">
+                        <span>EFV<sup>TM</sup></span>
+                    </div>
+                    <p>World's first EFV<sup>TM</sup> system. Designed for better living.</p>
+                </div>
+                <div class="footer-links">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="about.html">About EFV<sup>TM</sup></a></li>
+                        <li><a href="uwo.html">About UWO<sup>TM</sup></a></li>
+                        <li><a href="gallery.html">Gallery</a></li>
+                        <li><a href="preview.html">Preview</a></li>
+                        <li><a href="marketplace.html">Marketplace</a></li>
+                        <li><a href="Feedback.html">Feedback</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="privacy-policy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-connect">
+                    <h4>Connect</h4>
+                    <div class="social-icons">
+                        <a href="https://www.facebook.com/profile.php?id=61585343488735" class="social-icon-link"
+                            aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <img src="img/FB.svg" alt="Facebook" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.instagram.com/efv_framework/" class="social-icon-link"
+                            aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Insta (1).svg" alt="Instagram" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.linkedin.com/in/efv-framework/" class="social-icon-link"
+                            aria-label="LinkedIn" target="_blank" rel="noopener noreferrer">
+                            <img src="img/Linkedin.svg" alt="LinkedIn" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://www.threads.com/@efv_framework" class="social-icon-link" aria-label="Threads"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/Threads.svg" alt="Threads" style="width: 32px; height: 32px;">
+                        </a>
+                        <!-- <a href="#" class="social-icon-link" aria-label="WhatsApp">
+                            <img src="img/Whatsapp.svg" alt="WhatsApp" style="width: 32px; height: 32px;">
+                        </a> -->
+                        <a href="https://x.com/EfvFrame_work" class="social-icon-link" aria-label="X (Twitter)"
+                            target="_blank" rel="noopener noreferrer">
+                            <img src="img/x.png" alt="X (Twitter)"
+                                style="width: 32px; height: 32px; transition: transform 0.3s ease, opacity 0.3s ease;">
+                        </a>
+                        <a href="#" class="social-icon-link" aria-label="YouTube" target="_blank"
+                            rel="noopener noreferrer">
+                            <img src="img/YT (1).svg" alt="YouTube" style="width: 32px; height: 32px;">
+                        </a>
+                        <a href="https://in.pinterest.com/EFV_Framework/" class="social-icon-link"
+                            aria-label="Pinterest" target="_blank" rel="noopener noreferrer">
+                            <img src="img/pinterset.png" alt="Pinterest" style="width: 26px; height: 26px;">
+                        </a>
+                        <a href="mailto:admin@uwo24.com" class="social-icon-link" aria-label="Gmail">
+                            <img src="img/gmail.png" alt="Gmail" style="width: 26px; height: 26px;">
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                &copy; UWO<sup>TM</sup> — EFV<sup>TM</sup> is a UWO<sup>TM</sup> Innovation.
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/particles.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/cart.js?v=9.0"></script>
+    <script src="js/chatbot.js?v=9.0"></script>
+</body>
+
+</html>

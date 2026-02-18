@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard | EFV™</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- PDF.js for Library Access -->
+    <script src="js/pdfjs/pdf.min.js"></script>
+    <script src="js/efv-pdf-data.js"></script>
+</head>
+
+<body class="dashboard-body">
+
+    <div class="dashboard-container">
+        <!-- LEFT SIDEBAR -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <a href="index.html" class="logo">
+                    <img src="img/AISA.svg" alt="EFV Logo">
+                    <span>EFV<sup>TM</sup></span>
+                </a>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="marketplace.html" class="nav-item">
+                    <i class="fas fa-arrow-left"></i> <span>Back to Shop</span>
+                </a>
+                <button class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-th-large"></i> <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="cart">
+                    <i class="fas fa-shopping-cart"></i> <span>Cart Items</span>
+                    <span id="sidebar-cart-count" class="badge hidden">0</span>
+                </button>
+                <button class="nav-item" data-tab="orders">
+                    <i class="fas fa-box-open"></i> <span>My Orders</span>
+                </button>
+                <button class="nav-item" data-tab="library">
+                    <i class="fas fa-book-reader"></i> <span>My Library</span>
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <i class="fas fa-cog"></i> <span>Account Settings</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="dashboard-logout-btn" class="nav-item logout">
+                    <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- RIGHT CONTENT AREA -->
+        <main class="main-content">
+
+            <!-- DASHBOARD OVERVIEW TAB -->
+            <section id="dashboard" class="content-section active">
+                <header class="content-header">
+                    <div class="welcome-text">
+                        <h1 class="gradient-text">Hello, <span id="user-name-display">User</span> 👋</h1>
+                        <p>Welcome to your personal EFV dashboard.</p>
+                    </div>
+                    <div class="date-display" id="current-date"></div>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card glass-panel shine-hover">
+                        <div class="icon-box gold"><i class="fas fa-shopping-bag"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Orders</h3>
+                            <span id="stat-total-orders" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel shine-hover">
+                        <div class="icon-box blue"><i class="fas fa-digital-tachograph"></i></div>
+                        <div class="stat-info">
+                            <h3>Digital Products</h3>
+                            <span id="stat-total-digital" class="stat-value">0</span>
+                        </div>
+                    </div>
+                    <div class="stat-card glass-panel shine-hover">
+                        <div class="icon-box green"><i class="fas fa-rupee-sign"></i></div>
+                        <div class="stat-info">
+                            <h3>Total Spent</h3>
+                            <span id="stat-total-spent" class="stat-value">₹0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity or Banner could go here -->
+            </section>
+
+            <!-- CART ITEMS TAB -->
+            <section id="cart" class="content-section">
+                <header class="content-header">
+                    <h1>Your <span class="gold-text">Cart</span></h1>
+                    <p>Products waiting for checkout</p>
+                </header>
+
+                <div id="dashboard-cart-list" class="items-grid">
+                    <!-- Cart Items Injected Here -->
+                </div>
+                <div id="cart-empty-state" class="empty-state hidden">
+                    <i class="fas fa-shopping-cart"></i>
+                    <h3>Your cart is empty</h3>
+                    <a href="marketplace.html" class="btn btn-gold">Browse Marketplace</a>
+                </div>
+            </section>
+
+            <!-- MY ORDERS TAB -->
+            <section id="orders" class="content-section">
+                <header class="content-header">
+                    <h1>My <span class="gold-text">Orders</span></h1>
+                    <p>History of your purchased items</p>
+                </header>
+
+                <div id="dashboard-orders-list" class="orders-list">
+                    <!-- Orders Injected Here -->
+                </div>
+                <div id="orders-empty-state" class="empty-state hidden">
+                    <i class="fas fa-box"></i>
+                    <h3>No orders yet</h3>
+                    <a href="marketplace.html" class="btn btn-gold">Start Shopping</a>
+                </div>
+            </section>
+
+            <!-- MY LIBRARY TAB -->
+            <section id="library" class="content-section">
+                <header class="content-header">
+                    <h1>My <span class="gold-text">Library</span></h1>
+                    <p>Your digital collection</p>
+                </header>
+
+                <div id="dashboard-library-list" class="items-grid">
+                    <!-- Library Items Injected Here -->
+                </div>
+                <div id="library-empty-state" class="empty-state hidden">
+                    <i class="fas fa-book"></i>
+                    <h3>Library is empty</h3>
+                    <p>Purchase digital products to see them here.</p>
+                </div>
+            </section>
+
+            <!-- SETTINGS TAB -->
+            <section id="settings" class="content-section">
+                <header class="content-header">
+                    <h1>Account <span class="gold-text">Settings</span></h1>
+                    <p>Manage your profile and security</p>
+                </header>
+
+                <div class="settings-grid">
+                    <!-- Profile Card -->
+                    <div class="settings-card glass-panel shine-hover">
+                        <div class="settings-header">
+                            <div class="icon-box gold"><i class="fas fa-user-circle"></i></div>
+                            <h3>Personal Information</h3>
+                        </div>
+                        <form id="profile-form">
+                            <div class="form-group">
+                                <label>Full Name</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-user"></i>
+                                    <input type="text" id="settings-name" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Email Address</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="email" id="settings-email" readonly>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-gold full-width">Edit Profile</button>
+                        </form>
+                    </div>
+
+                    <!-- Security Card -->
+                    <div class="settings-card glass-panel shine-hover">
+                        <div class="settings-header">
+                            <div class="icon-box blue"><i class="fas fa-shield-alt"></i></div>
+                            <h3>Security & Login</h3>
+                        </div>
+                        <div class="security-options">
+                            <div class="security-item">
+                                <div>
+                                    <h4>Change Password</h4>
+                                    <p>Update your password regularly for security.</p>
+                                </div>
+                                <button class="btn btn-outline small" id="change-password-btn">Update</button>
+                            </div>
+                            <div class="security-item">
+                                <div>
+                                    <h4>Two-Factor Auth</h4>
+                                    <p>Add an extra layer of security.</p>
+                                </div>
+                                <button class="btn btn-outline small" disabled>Coming Soon</button>
+                            </div>
+                            <div class="settings-divider"></div>
+                            <button class="btn btn-danger full-width" id="settings-logout-btn">
+                                <i class="fas fa-sign-out-alt"></i> Logout from Account
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Addresses & Payment -->
+                    <div class="settings-card glass-panel shine-hover">
+                        <div class="settings-header">
+                            <div class="icon-box green"><i class="fas fa-map-marker-alt"></i></div>
+                            <h3>Saved Addresses</h3>
+                        </div>
+                        <div class="address-card">
+                            <p class="fade-text">No saved addresses found.</p>
+                            <button class="btn btn-outline full-width dashed-border">+ Add New Address</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/api-config.js"></script>
+    <script src="js/profile.js"></script>
+    <!-- Use existing cart.js logic if needed for global functions, but profile.js will handle specific dashboard logic -->
+</body>
+
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | EFV™</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+            /* Prevent body scroll, only card scrolls */
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .privacy-card {
+            max-width: 600px;
+            width: 95%;
+            max-height: 80vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 60px 40px 40px;
+            position: relative;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            animation: popUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes popUp {
+            0% {
+                transform: scale(0.85);
+                opacity: 0;
+                filter: blur(10px);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+                filter: blur(0);
+            }
+        }
+
+        .card-content {
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold-energy) transparent;
+            padding-right: 10px;
+        }
+
+        .card-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .card-content::-webkit-scrollbar-thumb {
+            background: var(--gold-energy);
+            border-radius: 10px;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 25px;
+            right: 25px;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 211, 105, 0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold-energy);
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 10;
+        }
+
+        .close-btn:hover {
+            background: var(--gold-energy);
+            color: var(--cosmic-black);
+            transform: rotate(90deg);
+        }
+
+        .policy-title {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-energy);
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <div class="modal-overlay">
+        <div class="privacy-card">
+            <a href="javascript:history.back()" class="close-btn" aria-label="Close">
+                <i class="fas fa-times"></i>
+            </a>
+
+            <h2 class="policy-title"><i class="fas fa-shield-alt" style="margin-right: 15px;"></i>Privacy Policy</h2>
+
+            <div class="card-content">
+                <p style="text-align: center; margin-bottom: 25px; font-weight: 600;">Protecting your frequency and your
+                    data.</p>
+
+                <p>At EFV™, we prioritize your privacy. We only collect the name and email you provide to keep you
+                    updated on our ecosystem.</p>
+
+                <p>Your data is encrypted, never shared with third parties, and used solely to enhance your Alignment
+                    Intelligence experience within the UWO™ framework.</p>
+
+                <p style="margin-top: 30px; opacity: 0.6; font-size: 0.85rem; text-align: center;">Last Updated:
+                    February 2026<br>For data requests, contact us through the official support channel.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/particles.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>
