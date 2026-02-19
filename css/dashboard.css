@@ -100,6 +100,29 @@ body.dashboard-body {
     text-align: center;
 }
 
+/* Action Icons for Tables */
+.btn-icon {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 8px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: scale(1.1);
+}
+
+.btn-icon:active {
+    transform: scale(0.95);
+}
+
 .nav-item .badge {
     background: var(--gold-text);
     color: black;
@@ -765,4 +788,310 @@ body.dashboard-body {
     to {
         transform: translateY(0);
     }
+}
+
+/* --- PROFESSIONAL DASHBOARD EXPANSION STYLES --- */
+
+/* Feature Cards (Dashboard Overview) */
+.dashboard-feature-card {
+    padding: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    transition: all 0.3s ease;
+}
+
+.dashboard-feature-card:hover {
+    border-color: var(--gold-text);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.dashboard-feature-card .feature-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.dashboard-feature-card .feature-header i {
+    font-size: 1.3rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.dashboard-feature-card h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.dashboard-feature-card .feature-content {
+    flex: 1;
+}
+
+.blue-text {
+    color: #4ecdc4;
+}
+
+.green-text {
+    color: #10b981;
+}
+
+.red-text {
+    color: #ff6b6b;
+}
+
+/* Address Cards */
+.address-card {
+    position: relative;
+    padding: 15px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+}
+
+.address-card.default {
+    border-color: var(--gold-text);
+    background: rgba(255, 211, 105, 0.03);
+}
+
+.address-card h5 {
+    margin: 0 0 8px;
+    font-size: 1rem;
+    color: var(--gold-text);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.default-badge {
+    font-size: 0.65rem;
+    background: var(--gold-text);
+    color: black;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.address-text {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    opacity: 0.7;
+    margin-bottom: 12px;
+}
+
+.address-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: auto;
+}
+
+.address-actions button {
+    padding: 5px 12px;
+    font-size: 0.8rem;
+}
+
+/* Notifications */
+.notifications-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.notification-item {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.2s;
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-item.unread {
+    border-left: 4px solid var(--gold-text);
+    background: rgba(255, 211, 105, 0.03);
+}
+
+.notification-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.notification-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.notification-icon.order {
+    background: rgba(78, 205, 196, 0.1);
+    color: #4ecdc4;
+}
+
+.notification-icon.digital {
+    background: rgba(255, 211, 105, 0.1);
+    color: var(--gold-text);
+}
+
+.notification-icon.shipment {
+    background: rgba(255, 107, 107, 0.1);
+    color: #ff6b6b;
+}
+
+.notification-body {
+    flex: 1;
+}
+
+.notification-body h5 {
+    margin: 0 0 4px;
+    font-size: 0.95rem;
+}
+
+.notification-body p {
+    margin: 0;
+    font-size: 0.85rem;
+    opacity: 0.6;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    opacity: 0.4;
+    margin-top: 5px;
+    display: block;
+}
+
+/* Order Timeline (Vertical for Sidebar-like view) */
+.order-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 20px;
+}
+
+.order-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    bottom: 5px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.timeline-step {
+    position: relative;
+    padding-bottom: 25px;
+    padding-left: 20px;
+}
+
+.timeline-step:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-step::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #333;
+    border: 2px solid var(--dark-bg);
+    z-index: 1;
+}
+
+.timeline-step.completed::before {
+    background: var(--gold-text);
+    box-shadow: 0 0 8px var(--gold-text);
+}
+
+.timeline-step.active::before {
+    background: var(--gold-text);
+    animation: pulseGold 2s infinite;
+}
+
+@keyframes pulseGold {
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(255, 215, 0, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(255, 215, 0, 0);
+    }
+}
+
+.timeline-step h5 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.timeline-step p {
+    margin: 3px 0 0;
+    font-size: 0.75rem;
+    opacity: 0.5;
+}
+
+/* Dashboard Cards inside Dashboard Tab */
+.feature-content h3 {
+    margin: 5px 0;
+    font-size: 1.2rem;
+    color: #fff;
+}
+
+.feature-content .status-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.red-badge {
+    background: rgba(255, 107, 107, 0.2);
+    color: #ff6b6b;
+}
+
+.green-badge {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.gold-badge {
+    background: rgba(255, 211, 105, 0.2);
+    color: var(--gold-text);
+}
+
+/* Utilities */
+.btn.small {
+    padding: 8px 15px;
+    font-size: 0.85rem;
+    width: auto;
+}
+
+.badge.red {
+    background: #ff4757 !important;
+}
+
+.hidden {
+    display: none !important;
 }

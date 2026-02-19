@@ -381,6 +381,8 @@ document.addEventListener('DOMContentLoaded', () => {
         card.setAttribute('data-id', product._id || product.id);
         card.setAttribute('data-name', product.title);
         card.setAttribute('data-price', product.price);
+        card.setAttribute('data-language', product.language || '');
+        card.setAttribute('data-subtitle', product.subtitle || '');
 
         const rawType = (product.type || 'book').toLowerCase();
         const typeLabel = {

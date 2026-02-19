@@ -5,7 +5,8 @@
 
 class EFVSecurity {
     constructor() {
-        this.isProtected = true;
+        this.isActive = false; // Security is OFF by default, enabled only during reading/listening
+        this.isProtected = false;
         this.isTampered = false;
         this.userId = 'N/A';
         this.userName = 'User';
@@ -50,7 +51,30 @@ class EFVSecurity {
         // 5. Try to get IP (Optional but requested)
         this.fetchIP();
 
-        console.log("✅ EFV Security Layer Active.");
+        console.log("✅ EFV Security Layer Initialized (Standby).");
+    }
+
+    enable() {
+        console.log("🛡️ EFV Security: ACTIVATING PROTECTION");
+        this.isActive = true;
+        this.isProtected = true;
+
+        // Show watermark
+        const wmContainer = document.getElementById('security-watermark-container');
+        if (wmContainer) wmContainer.style.display = 'block';
+    }
+
+    disable() {
+        console.log("🔓 EFV Security: DEACTIVATING PROTECTION");
+        this.isActive = false;
+        this.isProtected = false;
+
+        // Hide watermark
+        const wmContainer = document.getElementById('security-watermark-container');
+        if (wmContainer) wmContainer.style.display = 'none';
+
+        // If we were in a blur state, clear it
+        this.unlockContent();
     }
 
     loadUserData() {
@@ -93,6 +117,7 @@ class EFVSecurity {
         if (!document.getElementById('security-watermark-container')) {
             const wmContainer = document.createElement('div');
             wmContainer.id = 'security-watermark-container';
+            wmContainer.style.display = 'none'; // Hidden by default
             document.body.appendChild(wmContainer);
         }
 
@@ -128,12 +153,17 @@ class EFVSecurity {
                 opacity: 1;
             }
             .security-locked-blank {
+                display: block !important;
+                background: black !important;
+            }
+            .security-locked-blank > *:not(#security-overlay):not(#security-watermark-container) {
                 display: none !important;
             }
             .security-blur #security-shield {
                 display: block !important;
                 opacity: 1 !important;
                 pointer-events: all !important;
+                transition: none !important;
             }
             .security-blur main, 
             .security-blur header, 
@@ -143,6 +173,7 @@ class EFVSecurity {
             .security-blur .reader-overlay {
                 filter: blur(100px) !important;
                 opacity: 0 !important;
+                display: none !important;
             }
             .security-retry-btn {
                 margin-top: 2rem;
@@ -231,6 +262,7 @@ class EFVSecurity {
 
             if (isPrintScreen || isAltPrintScreen || isWinSnippet) {
                 e.preventDefault();
+                this.lockContent("Screenshot Shortcut Detected"); // Instant blanking
                 this.handlePrintScreen(isWinSnippet ? "Win+Shift+S/R Shortcut" : "PrintScreen Key");
             }
         });
@@ -418,6 +450,7 @@ class EFVSecurity {
     }
 
     triggerViolation(reason) {
+        if (!this.isActive) return; // Only trigger if actively protecting content
         if (this.isTampered) return; // Don't trigger multiple alerts
 
         console.error(`🚨 SECURITY VIOLATION: ${reason}`);
@@ -426,8 +459,8 @@ class EFVSecurity {
         // Log to backend (Mock)
         this.logViolation(reason);
 
-        // Instantly: Blur, Red Alert Overlay, Stop Media
-        document.body.classList.add('security-locked');
+        // Instantly: Blank everything, Blur, Red Alert Overlay, Stop Media
+        document.body.classList.add('security-locked', 'security-locked-blank');
         this.pauseMedia();
 
         // Dispatch event for other modules to react (e.g. destroy buffers)

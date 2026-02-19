@@ -4,6 +4,21 @@
 console.log("EFV Cart JS Loaded - Version: 22.0 - Forced Cache Refresh");
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Inject Premium Auth CSS
+    if (!document.getElementById('auth-premium-style')) {
+        const link = document.createElement('link');
+        link.id = 'auth-premium-style';
+        link.rel = 'stylesheet';
+        link.href = 'css/auth-premium.css';
+        document.head.appendChild(link);
+    }
+
+    // Inject Auth Toast
+    if (!document.getElementById('auth-toast')) {
+        const toast = document.createElement('div');
+        toast.id = 'auth-toast';
+        document.body.appendChild(toast);
+    }
     // Inject Cart HTML if not present
     if (!document.getElementById('cart-panel')) {
         const cartHTML = `
@@ -47,29 +62,196 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
     </div>
 
-    <!-- Auth Modal -->
-    <div class="modal-overlay" id="auth-modal">
-        <div class="modal-card" style="max-width: 400px; padding: 30px;">
-            <div class="modal-close" id="close-auth-modal">&times;</div>
-            <div class="auth-tabs" style="display: flex; border-bottom: 1px solid rgba(255, 211, 105, 0.2); margin-bottom: 20px;">
-                <div class="auth-tab active" id="tab-login" style="flex: 1; text-align: center; padding: 10px; cursor: pointer; color: var(--gold-energy); border-bottom: 2px solid var(--gold-energy);">Login</div>
-                <div class="auth-tab" id="tab-signup" style="flex: 1; text-align: center; padding: 10px; cursor: pointer; opacity: 0.6;">Sign Up</div>
+    <!-- Premium Auth Modal -->
+    <div class="auth-premium-overlay" id="auth-modal">
+        <div class="auth-premium-card">
+            <div class="auth-premium-close" id="close-auth-modal" title="Press ESC to close"><i class="fas fa-times"></i></div>
+            
+            <h2 class="auth-premium-title">Welcome to EFV™</h2>
+
+            <div class="auth-premium-tabs">
+                <div class="auth-tab-item active" data-auth-tab="login">Login</div>
+                <div class="auth-tab-item" data-auth-tab="signup">Create Account</div>
             </div>
 
             <!-- Login Form -->
-            <form id="login-form" style="display: flex; flex-direction: column; gap: 15px;">
-                <input type="email" placeholder="Email Address" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
-                <input type="password" placeholder="Password" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
-                <button type="submit" class="btn btn-gold" style="width: 100%;">Login</button>
+            <form id="login-form" class="auth-premium-form active">
+                <div class="input-group">
+                    <label class="auth-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="login-email" class="auth-input" placeholder="Enter your email" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="auth-label">Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="login-password" class="auth-input" placeholder="••••••••" required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fas fa-eye password-toggle"></i>
+                    </div>
+                </div>
+                
+                <div class="auth-extras">
+                    <label>
+                        <input type="checkbox" id="remember-me">
+                        <span>Remember me</span>
+                    </label>
+                    <a href="#" class="forgot-link">Forgot Password?</a>
+                </div>
+
+                <div id="login-general-error" class="error-message" style="margin-bottom:16px; text-align:center; font-weight:600;"></div>
+                
+                <button type="submit" class="auth-btn">
+                    <span>Login Securely</span>
+                    <div class="loader"></div>
+                </button>
             </form>
 
             <!-- Sign Up Form -->
-            <form id="signup-form" style="display: none; flex-direction: column; gap: 15px;">
-                <input type="text" placeholder="Full Name" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
-                <input type="email" placeholder="Email Address" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
-                <input type="password" placeholder="Password" required style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 211, 105, 0.2); padding: 12px; border-radius: 8px; color: white; outline: none;">
-                <button type="submit" class="btn btn-gold" style="width: 100%;">Create Account</button>
+            <form id="signup-form" class="auth-premium-form">
+                <div class="input-group">
+                    <label class="auth-label">Full Name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="signup-name" class="auth-input" placeholder="John Doe" required>
+                        <i class="fas fa-user input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="auth-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="signup-email" class="auth-input" placeholder="email@example.com" required>
+                        <i class="fas fa-envelope input-icon"></i>
+                    </div>
+                    <div class="error-message" id="signup-email-error">Please enter a valid email</div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="auth-label">Phone Number</label>
+                    <div class="input-wrapper">
+                        <input type="tel" id="signup-phone" class="auth-input" placeholder="10-digit number" required maxlength="10">
+                        <i class="fas fa-phone input-icon"></i>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="auth-label">Create Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="signup-password" class="auth-input" placeholder="••••••••" required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <i class="fas fa-eye password-toggle"></i>
+                    </div>
+                    <div class="helper-text">Minimum 6 characters</div>
+                </div>
+                
+                <div class="strength-indicator"><div class="strength-bar"></div></div>
+                
+                <div class="input-group" style="margin-top: 5px;">
+                    <label class="auth-label">Verify Password</label>
+                    <div class="input-wrapper">
+                        <input type="password" id="signup-confirm-password" class="auth-input" placeholder="••••••••" required>
+                        <i class="fas fa-check-circle input-icon"></i>
+                    </div>
+                    <div class="error-message" id="signup-match-error">Passwords do not match</div>
+                </div>
+                
+                <div id="signup-general-error" class="error-message" style="margin:12px 0; text-align:center; font-weight:600;"></div>
+
+                <button type="submit" class="auth-btn" id="signup-submit-btn">
+                    <span>Create Account</span>
+                    <div class="loader"></div>
+                </button>
             </form>
+            <!-- Forgot Password Flow -->
+            <div id="forgot-password-flow" style="display: none;">
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <div class="auth-premium-back" id="back-to-login">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </div>
+                    <div style="flex: 1; text-align: center; font-size: 1rem; font-weight: 600; color: #fff; font-family: 'Cinzel', serif;" id="forgot-flow-title">Forgot Password</div>
+                    <div style="width: 50px;"></div>
+                </div>
+                <!-- Step Indicator -->
+                <div class="fp-step-indicator">
+                    <div class="fp-step-dot active" id="fp-dot-1"></div>
+                    <div class="fp-step-dot" id="fp-dot-2"></div>
+                    <div class="fp-step-dot" id="fp-dot-3"></div>
+                </div>
+
+                <!-- Step 1: Send OTP -->
+                <form id="forgot-email-form" class="auth-premium-form active">
+                    <p style="text-align: center; margin-bottom: 20px; opacity: 0.8; font-size: 0.9rem;">Enter your email to receive a 6-digit verification code.</p>
+                    <div class="input-group">
+                        <label class="auth-label">Email Address</label>
+                        <div class="input-wrapper">
+                            <input type="email" id="forgot-email" class="auth-input" placeholder="Enter your email" required>
+                            <i class="fas fa-envelope input-icon"></i>
+                        </div>
+                    </div>
+                    <div id="forgot-email-error" class="error-message" style="margin-bottom: 20px; text-align: center;"></div>
+                    <button type="submit" class="auth-btn">
+                        <span>Send Code</span>
+                        <div class="loader"></div>
+                    </button>
+                </form>
+
+                <!-- Step 2: Verify OTP -->
+                <form id="forgot-otp-form" class="auth-premium-form">
+                    <p style="text-align: center; margin-bottom: 20px; opacity: 0.8; font-size: 0.9rem;">Enter the 6-digit code sent to your email.</p>
+                    <div class="input-group">
+                        <label class="auth-label">Verification Code</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="forgot-otp" class="auth-input" placeholder="123456" maxlength="6" required style="letter-spacing: 5px; text-align: center; font-size: 1.5rem;">
+                            <i class="fas fa-shield-alt input-icon"></i>
+                        </div>
+                    </div>
+                    <div id="forgot-otp-error" class="error-message" style="margin-bottom: 20px; text-align: center;"></div>
+                    <button type="submit" class="auth-btn">
+                        <span>Verify Code</span>
+                        <div class="loader"></div>
+                    </button>
+                    <p style="text-align: center; margin-top: 15px; font-size: 0.85rem;">
+                        Didn't get it? <a href="#" id="resend-otp-btn" style="color: var(--gold-energy); text-decoration: none;">Resend</a>
+                    </p>
+                </form>
+
+                <!-- Step 3: New Password -->
+                <form id="forgot-reset-form" class="auth-premium-form">
+                    <p style="text-align: center; margin-bottom: 20px; opacity: 0.8; font-size: 0.9rem;">Create a new secure password.</p>
+                    <div class="input-group">
+                        <label class="auth-label">New Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="forgot-new-password" class="auth-input" placeholder="••••••••" required>
+                            <i class="fas fa-lock input-icon"></i>
+                            <i class="fas fa-eye password-toggle"></i>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="auth-label">Confirm New Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="forgot-confirm-password" class="auth-input" placeholder="••••••••" required>
+                            <i class="fas fa-check-circle input-icon"></i>
+                        </div>
+                    </div>
+                    <div id="forgot-reset-error" class="error-message" style="margin-bottom: 20px; text-align: center;"></div>
+                    <button type="submit" class="auth-btn">
+                        <span>Reset Password</span>
+                        <div class="loader"></div>
+                    </button>
+                </form>
+                
+                <!-- Success Message -->
+                <div id="forgot-success-view" style="display: none; text-align: center; padding: 20px 0;">
+                    <div style="font-size: 4rem; color: #10b981; margin-bottom: 20px;">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 style="color: #fff; margin-bottom: 15px; font-family: 'Cinzel', serif;">Password Reset!</h3>
+                    <p style="opacity: 0.8; margin-bottom: 25px;">Your password has been updated successfully.</p>
+                    <button class="auth-btn" id="finish-reset-btn">Login Now</button>
+                </div>
+            </div>
         </div>
     </div>`;
         document.body.insertAdjacentHTML('beforeend', cartHTML);
@@ -172,41 +354,54 @@ document.addEventListener('DOMContentLoaded', () => {
     function getUserKey(baseKey) {
         const user = JSON.parse(localStorage.getItem('efv_user'));
         if (!user || !user.email) return baseKey;
-        // Clean email to use as key part (remove special chars)
         const cleanEmail = user.email.toLowerCase().replace(/[^a-z0-9]/g, '_');
         return `${baseKey}_${cleanEmail}`;
     }
+    window.getUserKey = getUserKey;
 
-    // Sync library from backend to localStorage
+
+    const API_BASE = (typeof CONFIG !== 'undefined' && CONFIG.API_BASE_URL) ? CONFIG.API_BASE_URL : 'http://localhost:5000';
+
     async function syncLibraryWithBackend() {
         const user = JSON.parse(localStorage.getItem('efv_user'));
-        const token = localStorage.getItem('efv_token');
-        if (!user || !token) return;
+        const token = localStorage.getItem('authToken');
+        if (!token) return;
 
         try {
-            const response = await fetch('http://localhost:5000/api/library/my-library', {
+            const response = await fetch(`${API_BASE}/api/library/my-library`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            const data = await response.json();
 
             if (response.ok) {
+                const data = await response.json();
                 const libKey = getUserKey('efv_digital_library');
+
                 const localLibrary = data.map(prod => ({
-                    id: prod.productId || prod._id,
+                    id: (prod.productId || prod._id || '').toString(),
+                    productId: (prod.productId || prod._id || '').toString(),
                     name: prod.title,
+                    title: prod.title,
+                    language: prod.language || '',
+                    subtitle: prod.subtitle || '',
                     type: prod.type,
                     thumbnail: prod.thumbnail,
+                    filePath: prod.filePath,
                     date: prod.purchasedAt ? new Date(prod.purchasedAt).toLocaleDateString() : new Date().toLocaleDateString()
                 }));
-                localStorage.setItem(libKey, JSON.stringify(localLibrary));
 
-                updateLibraryDisplay();
-                updateMarketplaceButtons();
+                // Update only if data is valid array
+                if (Array.isArray(localLibrary)) {
+                    localStorage.setItem(libKey, JSON.stringify(localLibrary));
+                }
+
+                if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
+                if (typeof updateMarketplaceButtons === 'function') updateMarketplaceButtons();
             }
         } catch (error) {
             console.error('Library sync error:', error);
         }
     }
+    window.syncLibraryWithBackend = syncLibraryWithBackend;
 
     // Update Marketplace buttons to reflect library state
     function updateMarketplaceButtons() {
@@ -218,19 +413,30 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = card.querySelector('.add-to-cart');
 
             if (btn && (id.includes('audio') || id.includes('ebook'))) {
-                const isOwned = library.some(item => item.id === id);
+                // Robust check: matches raw ID or normalized (removal of _en suffix)
+                const isOwned = library.some(item => {
+                    const libId = (item.id || item.productId || '').toString();
+                    return libId === id;
+                });
+
                 if (isOwned) {
                     btn.textContent = '✓ In Library';
                     btn.style.background = '#10b981';
-                    btn.disabled = false; // Keep clickable to allow access but logic handles it
+                    btn.style.color = 'black';
+                    btn.style.fontWeight = '700';
+                    btn.disabled = false;
                 } else {
-                    btn.textContent = 'Purchase Now';
+                    const isDigital = id.includes('audio') || id.includes('ebook');
+                    btn.textContent = isDigital ? 'Purchase Now' : 'Add to Cart';
                     btn.style.background = '';
+                    btn.style.color = '';
+                    btn.style.fontWeight = '';
                     btn.disabled = false;
                 }
             }
         });
     }
+    window.updateMarketplaceButtons = updateMarketplaceButtons;
     // Select via ID (if updated) or Class for standard items
     const cartToggle = document.getElementById('cart-toggle') || document.querySelector('.cart-icon');
     const cartPanel = document.getElementById('cart-panel');
@@ -243,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateCartUI() {
         // Update Count
         const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0);
-        cartCount.textContent = totalItems;
+        if (cartCount) cartCount.textContent = totalItems;
 
         // Update List
         if (cart.length === 0) {
@@ -431,7 +637,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         showTermsAndConditions(() => {
                             const name = card.getAttribute('data-name');
                             const price = parseFloat(card.getAttribute('data-price'));
-                            const item = { id, name, price, quantity: qty };
+                            const item = {
+                                id,
+                                name,
+                                price,
+                                quantity: qty,
+                                language: card.getAttribute('data-language') || '',
+                                subtitle: card.getAttribute('data-subtitle') || ''
+                            };
 
                             modal.classList.remove('active');
                             document.body.classList.remove('modal-open');
@@ -562,7 +775,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Helper for actual cart addition logic
-    function processAddToCart(id, card, triggerModal = true, customQty = 1, directCheckout = false) {
+    async function processAddToCart(id, card, triggerModal = true, customQty = 1, directCheckout = false) {
         if (triggerModal) {
             openProductModal(id, card);
             return;
@@ -570,32 +783,123 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const name = card.getAttribute('data-name');
         const price = parseFloat(card.getAttribute('data-price'));
+        const language = card.getAttribute('data-language') || '';
+        const subtitle = card.getAttribute('data-subtitle') || '';
         const isDigitalProduct = id.includes('audio') || id.includes('ebook');
 
         const quantityToAdd = parseInt(customQty) || 1;
 
         if (isDigitalProduct) {
-            // Digital products are added to library ONLY after successful payment
-            // (Removed instant demo addition to satisfy user requirement of "Purchase complete -> Auto add")
+            // TESTING MODE: Direct Update to Library (Bypassing Cart/Payment for Testing)
+            const libKey = getUserKey('efv_digital_library');
+            let library = JSON.parse(localStorage.getItem(libKey)) || [];
 
-            // Add to cart
-            const existingInCart = cart.find(item => item.id === id);
-            if (!existingInCart) {
-                cart.push({ id, name, price, quantity: quantityToAdd, type: id.includes('audio') ? 'AUDIOBOOK' : 'EBOOK' });
-                localStorage.setItem('efv_cart', JSON.stringify(cart));
+            // IMPORTANT: Only check by ID — audiobook and ebook of same volume share the same name/title.
+            // Name-based check would falsely report ebook as owned when only audiobook is owned.
+            const alreadyOwned = library.some(item =>
+                item.id === id || item.productId === id
+            );
+
+            if (!alreadyOwned) {
+                const user = JSON.parse(localStorage.getItem('efv_user'));
+                const token = localStorage.getItem('authToken');
+
+                // ⚠️ KEY FIX: Call backend FIRST and AWAIT it, then redirect.
+                // Previously, the confirm+redirect happened BEFORE the backend call finished,
+                // causing a race condition where the library page loaded before the item was saved.
+
+                if (user && token) {
+                    // Show loading state
+                    const purchasingMsg = `Purchasing "${name}"... Please wait.`;
+                    console.log('🛒 Starting backend purchase...');
+
+                    try {
+                        const response = await fetch(`${API_BASE}/api/orders/test-digital`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({
+                                productId: id,
+                                price: price,
+                                name: name,
+                                type: id.includes('audio') ? 'AUDIOBOOK' : 'EBOOK'
+                            })
+                        });
+                        const data = await response.json();
+
+                        if (data.success) {
+                            console.log('✅ Digital Test Purchase Success (backend saved):', data);
+
+                            // Now add to localStorage (backend is already saved)
+                            library.push({
+                                id: id,
+                                productId: id,
+                                name: name,
+                                title: name,
+                                language: language,
+                                subtitle: subtitle,
+                                type: id.includes('audio') ? 'Audiobook' : 'E-Book',
+                                thumbnail: card.querySelector('img') ? card.querySelector('img').src : 'img/vol1-cover.png',
+                                date: new Date().toLocaleDateString()
+                            });
+                            localStorage.setItem(libKey, JSON.stringify(library));
+
+                            // Add to purchase history
+                            const historyKey = getUserKey('efv_purchase_history');
+                            let history = JSON.parse(localStorage.getItem(historyKey)) || [];
+                            history.push({ name, price, quantity: 1, date: new Date().toLocaleDateString() });
+                            localStorage.setItem(historyKey, JSON.stringify(history));
+
+                            // NOW redirect (backend is saved, so library page will have the item)
+                            if (confirm(`✅ "${name}" purchased successfully!\n\nGo to My Library now?`)) {
+                                document.location.href = 'profile.html?tab=library';
+                            }
+                        } else {
+                            console.warn('⚠️ Backend purchase failed:', data.message);
+                            alert(`Purchase failed: ${data.message}\n\nPlease try again or contact support.`);
+                        }
+                    } catch (err) {
+                        console.error('Backend purchase error:', err);
+                        // Fallback: save locally and show warning
+                        library.push({
+                            id: id, productId: id, name, title: name,
+                            type: id.includes('audio') ? 'Audiobook' : 'E-Book',
+                            thumbnail: card.querySelector('img') ? card.querySelector('img').src : 'img/vol1-cover.png',
+                            date: new Date().toLocaleDateString()
+                        });
+                        localStorage.setItem(libKey, JSON.stringify(library));
+                        if (confirm(`"${name}" added to Library (offline mode).\nNote: May not sync across devices.\n\nGo to My Library?`)) {
+                            document.location.href = 'profile.html?tab=library';
+                        }
+                    }
+                } else {
+                    // Not logged in — save locally and prompt login
+                    library.push({
+                        id: id, productId: id, name, title: name,
+                        type: id.includes('audio') ? 'Audiobook' : 'E-Book',
+                        thumbnail: card.querySelector('img') ? card.querySelector('img').src : 'img/vol1-cover.png',
+                        date: new Date().toLocaleDateString()
+                    });
+                    localStorage.setItem(libKey, JSON.stringify(library));
+                    if (confirm(`"${name}" added to Library!\n\nGo to My Library now?`)) {
+                        document.location.href = 'profile.html?tab=library';
+                    }
+                }
+
+            } else {
+                if (confirm(`You already own "${name}".\n\nGo to Library?`)) {
+                    document.location.href = 'profile.html?tab=library';
+                }
             }
 
-            updateCartUI();
+            // 3. Update UI
             if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
             if (typeof updateMarketplaceButtons === 'function') updateMarketplaceButtons();
 
-            if (directCheckout) {
-                // Direct buy for digital products
-                checkoutOrder([{ id, name, price, quantity: quantityToAdd, type: id.includes('audio') ? 'AUDIOBOOK' : 'EBOOK' }]);
-            } else {
-                // Open Cart Panel
-                toggleCart(true);
-            }
+            // 3. Do NOT open cart, stay on page or reflect state
+            return;
         } else {
             // Physical
             const existing = cart.find(item => item.id === id);
@@ -713,26 +1017,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function switchTab(mode) {
-        if (mode === 'login') {
-            tabLogin.classList.add('active');
-            tabSignup.classList.remove('active');
-            tabLogin.style.color = 'var(--gold-energy)';
-            tabLogin.style.borderBottom = '2px solid var(--gold-energy)';
-            tabSignup.style.opacity = '0.6';
-            tabSignup.style.borderBottom = 'none';
-            tabSignup.style.color = 'inherit';
-            loginForm.style.display = 'flex';
-            signupForm.style.display = 'none';
-        } else {
-            tabSignup.classList.add('active');
-            tabLogin.classList.remove('active');
-            tabSignup.style.color = 'var(--gold-energy)';
-            tabSignup.style.borderBottom = '2px solid var(--gold-energy)';
-            tabLogin.style.opacity = '0.6';
-            tabLogin.style.borderBottom = 'none';
-            tabLogin.style.color = 'inherit';
-            signupForm.style.display = 'flex';
-            loginForm.style.display = 'none';
+        // Update tab items — uses data-auth-tab attribute (new HTML structure)
+        document.querySelectorAll('.auth-tab-item').forEach(t => {
+            t.classList.toggle('active', t.dataset.authTab === mode);
+        });
+        // Update forms — show matching form, hide others
+        document.querySelectorAll('.auth-premium-form').forEach(f => {
+            f.classList.remove('active');
+            f.style.display = 'none';
+        });
+        const activeForm = document.getElementById(`${mode}-form`);
+        if (activeForm) {
+            activeForm.classList.add('active');
+            activeForm.style.display = 'flex';
         }
     }
 
@@ -1575,275 +1872,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Event Listeners
     async function checkoutOrder(itemsOverride = null) {
         const user = JSON.parse(localStorage.getItem('efv_user'));
-        if (!user || applySecurityToken(user.email) === null) {
+        if (!user) {
+            alert('Please login to proceed to checkout');
             openAuthModal('login');
             return;
         }
 
-        const itemsToProcess = itemsOverride || cart;
-
-        if (itemsToProcess.length === 0) {
-            alert('Your cart is empty.');
-            return;
+        if (itemsOverride) {
+            // "Buy Now" path: Use only the specific item
+            localStorage.setItem('directCheckout', JSON.stringify(itemsOverride));
+        } else {
+            // "Cart" path: Ensure we use the current cart
+            localStorage.removeItem('directCheckout');
         }
 
-        const totalAmount = itemsToProcess.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-        const btn = document.getElementById('checkout-btn');
-        const originalText = btn?.textContent || 'Checkout';
-        if (btn) {
-            btn.textContent = 'Initializing Payment...';
-            btn.disabled = true;
-        }
-
-        const isOnlyDigital = itemsToProcess.every(item => item.id.includes('audio') || item.id.includes('ebook'));
-
-        if (isOnlyDigital) {
-            // --- INSTANT ACCESS BYPASS FOR DIGITAL PRODUCTS ---
-            if (btn) btn.textContent = 'Granting Access...';
-
-            setTimeout(async () => {
-                try {
-                    // Direct Fulfillment logic skip Razorpay
-                    const purchasedItems = [...itemsToProcess];
-                    if (!itemsOverride) {
-                        cart = [];
-                        localStorage.setItem('efv_cart', JSON.stringify(cart));
-                        updateCartUI();
-                    }
-
-                    // Sync library with backend
-                    syncLibraryWithBackend().catch(err => console.error('Sync failed:', err));
-
-                    // Manual Library Update (Local & Demo DB)
-                    for (const item of purchasedItems) {
-                        const isDigital = item.id.includes('audio') || item.id.includes('ebook');
-                        if (isDigital) {
-                            const libKey = getUserKey('efv_digital_library');
-                            let currentLibrary = JSON.parse(localStorage.getItem(libKey)) || [];
-                            if (!currentLibrary.some(l => l.id === item.id)) {
-                                currentLibrary.push({
-                                    id: item.id,
-                                    name: item.name,
-                                    type: item.id.includes('audio') ? 'Audiobook' : 'E-Book',
-                                    date: new Date().toLocaleDateString()
-                                });
-                                localStorage.setItem(libKey, JSON.stringify(currentLibrary));
-
-                                const demoToken = btoa(user.email);
-                                await fetch('http://localhost:5000/api/demo/add-to-library', {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                        'Authorization': `Bearer ${demoToken}`
-                                    },
-                                    body: JSON.stringify({ productId: item.id })
-                                }).catch(e => console.error('Library Sync Error:', e));
-                            }
-                        }
-
-                        const historyKey = getUserKey('efv_purchase_history');
-                        let currentHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
-                        const existing = currentHistory.find(h => h.name === item.name);
-                        if (existing) existing.quantity += item.quantity;
-                        else currentHistory.push({ name: item.name, price: item.price, quantity: item.quantity, date: new Date().toLocaleDateString() });
-                        localStorage.setItem(historyKey, JSON.stringify(currentHistory));
-                    }
-
-                    if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
-                    if (typeof updateHistoryDisplay === 'function') updateHistoryDisplay();
-
-                    alert('✅ Product added to your library instantly! Redirecting to Dashboard...');
-                    window.location.href = 'profile.html';
-
-                } catch (e) {
-                    console.error('Fast fulfillment error:', e);
-                    alert('Error granting access. Please try again.');
-                } finally {
-                    if (btn) {
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
-                }
-            }, 1000);
-            return;
-        }
-
-        try {
-            // Deactivate security shield during checkout to allow input and focus
-            if (typeof deactivateSecurityShield === 'function') deactivateSecurityShield();
-
-            // 1. Load Razorpay SDK
-            const isLoaded = await loadRazorpayScript();
-            if (!isLoaded) {
-                alert('Razorpay SDK failed to load.');
-                if (btn) {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }
-                return;
-            }
-
-            // 2. Create Razorpay Order via Backend
-            const rzpRes = await fetch('http://localhost:5000/api/orders/razorpay', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: totalAmount })
-            });
-            const rzpOrderData = await rzpRes.json();
-
-            if (!rzpRes.ok) throw new Error(rzpOrderData.message || 'Failed to create payment order');
-
-            // 3. Open Razorpay Modal
-            const options = {
-                key: 'rzp_live_SBFlInxBiRfOGd',
-                amount: rzpOrderData.amount,
-                currency: rzpOrderData.currency,
-                name: 'EFV Energy Frequency Vibration',
-                description: 'Digital/Physical Purchase',
-                order_id: rzpOrderData.id,
-                prefill: {
-                    name: user.name || 'User',
-                    email: user.email
-                },
-                theme: { color: '#FFD369' },
-                modal: {
-                    ondismiss: function () {
-                        if (btn) {
-                            btn.textContent = originalText;
-                            btn.disabled = false;
-                        }
-                    }
-                },
-                handler: async function (response) {
-                    if (btn) btn.textContent = 'Verifying Payment...';
-
-                    try {
-                        const verifyRes = await fetch('http://localhost:5000/api/orders/verify', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                razorpay_order_id: response.razorpay_order_id,
-                                razorpay_payment_id: response.razorpay_payment_id,
-                                razorpay_signature: response.razorpay_signature,
-                                customer: {
-                                    name: user.name || 'Customer',
-                                    email: user.email,
-                                    address: '123 EFV St, Meta City'
-                                },
-                                items: itemsToProcess.map(item => ({
-                                    productId: item.id,
-                                    quantity: item.quantity
-                                }))
-                            })
-                        });
-
-                        const data = await verifyRes.json();
-
-                        if (verifyRes.ok) {
-                            // Fulfill Order
-                            const baseUrl = window.location.origin + window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/'));
-                            const trackingUrl = `${baseUrl}/tracking.html?id=${data.order._id}`;
-
-                            if (confirm(`✅ Payment Successful!\n\nOrder ID: ${data.order.orderId}\n\nClick OK to track your order.`)) {
-                                window.location.href = trackingUrl;
-                            }
-
-                            const purchasedItems = [...itemsToProcess];
-                            if (!itemsOverride) {
-                                cart = [];
-                                localStorage.setItem('efv_cart', JSON.stringify(cart));
-                                updateCartUI();
-                            }
-                            toggleUserProfile(true);
-                            toggleCart(true);
-
-                            // Sync library with backend
-                            syncLibraryWithBackend().catch(err => console.error('Sync failed:', err));
-
-                            // Manual Library Update
-                            purchasedItems.forEach(async (item) => {
-                                const isDigital = item.id.includes('audio') || item.id.includes('ebook');
-                                if (isDigital) {
-                                    const libKey = getUserKey('efv_digital_library');
-                                    let currentLibrary = JSON.parse(localStorage.getItem(libKey)) || [];
-                                    if (!currentLibrary.some(l => l.id === item.id)) {
-                                        currentLibrary.push({
-                                            id: item.id,
-                                            name: item.name,
-                                            type: item.id.includes('audio') ? 'Audiobook' : 'E-Book',
-                                            date: new Date().toLocaleDateString()
-                                        });
-                                        localStorage.setItem(libKey, JSON.stringify(currentLibrary));
-
-                                        const demoToken = btoa(user.email);
-                                        await fetch('http://localhost:5000/api/demo/add-to-library', {
-                                            method: 'POST',
-                                            headers: {
-                                                'Content-Type': 'application/json',
-                                                'Authorization': `Bearer ${demoToken}`
-                                            },
-                                            body: JSON.stringify({ productId: item.id })
-                                        }).catch(e => console.error('Library Sync Error:', e));
-                                    }
-                                }
-
-                                const historyKey = getUserKey('efv_purchase_history');
-                                let currentHistory = JSON.parse(localStorage.getItem(historyKey)) || [];
-                                const existing = currentHistory.find(h => h.name === item.name);
-                                if (existing) existing.quantity += item.quantity;
-                                else currentHistory.push({ name: item.name, price: item.price, quantity: item.quantity, date: new Date().toLocaleDateString() });
-                                localStorage.setItem(historyKey, JSON.stringify(currentHistory));
-                            });
-
-                            if (typeof updateLibraryDisplay === 'function') updateLibraryDisplay();
-                            if (typeof updateHistoryDisplay === 'function') updateHistoryDisplay();
-                        } else {
-                            alert(`Verification Failed: ${data.message}`);
-                        }
-                    } catch (e) {
-                        alert('Verification Error: ' + e.message);
-                    } finally {
-                        if (btn) {
-                            btn.textContent = originalText;
-                            btn.disabled = false;
-                        }
-                    }
-                },
-                modal: {
-                    ondismiss: function () {
-                        if (btn) {
-                            btn.textContent = originalText;
-                            btn.disabled = false;
-                        }
-                    }
-                }
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.on('payment.failed', function (resp) {
-                alert(`Payment Failed: ${resp.error.description}`);
-                if (btn) {
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }
-            });
-            // Close Cart Panel to focus on Razorpay
-            const cartPanel = document.getElementById('cart-panel');
-            const cartBackdrop = document.querySelector('.cart-backdrop');
-            if (cartPanel) cartPanel.classList.remove('active');
-            if (cartBackdrop) cartBackdrop.classList.remove('active');
-
-            rzp.open();
-
-        } catch (error) {
-            console.error('Checkout Error:', error);
-            alert(`Checkout Error: ${error.message}`);
-            if (btn) {
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
-        }
+        // Redirect to professional checkout flow
+        window.location.href = 'checkout.html';
     }
 
     // Helper to simulate token check or basic validation
@@ -1865,23 +1909,166 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     if (loginBtn) loginBtn.addEventListener('click', () => openAuthModal('login'));
-    if (signupBtn) signupBtn.addEventListener('click', () => openAuthModal('signup'));
-    if (closeAuthModal) closeAuthModal.addEventListener('click', closeAuth);
+    // --- Premium Auth Helpers ---
+    window.showToast = function (message) {
+        const toast = document.getElementById('auth-toast');
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add('active');
+        setTimeout(() => toast.classList.remove('active'), 3000);
+    };
 
-    if (tabLogin) tabLogin.addEventListener('click', () => switchTab('login'));
-    if (tabSignup) tabSignup.addEventListener('click', () => switchTab('signup'));
+    window.openAuthModal = function (tab = 'login') {
+        const modal = document.getElementById('auth-modal');
+        if (!modal) return;
+        modal.classList.add('active');
+        switchTab(tab);
+    };
+
+    window.closeAuth = function () {
+        const modal = document.getElementById('auth-modal');
+        if (modal) modal.classList.remove('active');
+    };
+
+    function switchTab(tab) {
+        // Update tabs
+        document.querySelectorAll('.auth-tab-item').forEach(t => {
+            t.classList.toggle('active', t.dataset.authTab === tab);
+        });
+
+        // Update forms
+        document.querySelectorAll('.auth-premium-form').forEach(f => {
+            f.classList.remove('active');
+            f.style.display = 'none';
+        });
+
+        const activeForm = document.getElementById(`${tab}-form`);
+        if (activeForm) {
+            activeForm.classList.add('active');
+            activeForm.style.display = 'flex';
+        }
+    }
+
+    // Modal Events
+    if (closeAuthModal) closeAuthModal.onclick = closeAuth;
+
+    document.querySelectorAll('.auth-tab-item').forEach(tab => {
+        tab.onclick = () => switchTab(tab.dataset.authTab);
+    });
+
+    // Password Toggle
+    document.querySelectorAll('.password-toggle').forEach(eye => {
+        eye.onclick = () => {
+            const input = eye.parentElement.querySelector('input');
+            if (input.type === 'password') {
+                input.type = 'text';
+                eye.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                eye.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        };
+    });
+
+    // Strength Checker
+    const signupPass = document.getElementById('signup-password');
+    const strengthBar = document.querySelector('.strength-bar');
+    const strengthContainer = document.querySelector('.strength-indicator');
+
+    if (signupPass) {
+        signupPass.oninput = () => {
+            const val = signupPass.value;
+            if (!val) {
+                strengthContainer.style.display = 'none';
+                return;
+            }
+            strengthContainer.style.display = 'block';
+
+            let strength = 0;
+            if (val.length >= 6) strength++;
+            if (val.match(/[A-Z]/) && val.match(/[0-9]/)) strength++;
+            if (val.match(/[^A-Za-z0-9]/)) strength++;
+
+            strengthBar.className = 'strength-bar';
+            if (strength === 1) strengthBar.classList.add('weak');
+            else if (strength === 2) strengthBar.classList.add('medium');
+            else if (strength === 3) strengthBar.classList.add('strong');
+        };
+    }
+
+    // Real-time Validation
+    function validateEmail(email) {
+        return String(email).toLowerCase().match(/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/);
+    }
+
+    const signupEmail = document.getElementById('signup-email');
+    if (signupEmail) {
+        signupEmail.onblur = function () {
+            const group = this.closest('.input-group');
+            const err = group ? group.querySelector('.error-message') : null;
+            if (err) {
+                if (!validateEmail(this.value)) err.style.display = 'block';
+                else err.style.display = 'none';
+            }
+        };
+    }
+
+    const signupPhone = document.getElementById('signup-phone');
+    if (signupPhone) {
+        signupPhone.onblur = function () {
+            const group = this.closest('.input-group');
+            const err = group ? group.querySelector('.error-message') : null;
+            if (err) {
+                if (this.value && this.value.length !== 10) err.style.display = 'block';
+                else err.style.display = 'none';
+            }
+        };
+    }
+
+    const signupConfirm = document.getElementById('signup-confirm-password');
+    if (signupConfirm) {
+        signupConfirm.oninput = function () {
+            const group = this.closest('.input-group');
+            const err = group ? group.querySelector('.error-message') : null;
+            if (err) {
+                if (this.value !== signupPass.value) err.style.display = 'block';
+                else err.style.display = 'none';
+            }
+        };
+    }
+
+    // Close on ESC
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeAuth();
+    });
+
+    // Close on Click Outside
+    const authOverlay = document.getElementById('auth-modal');
+    if (authOverlay) {
+        authOverlay.onclick = (e) => {
+            if (e.target === authOverlay) closeAuth();
+        };
+    }
 
     // Simulate Form Submission
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = loginForm.querySelector('input[type="email"]').value.trim().toLowerCase();
-            const password = loginForm.querySelector('input[type="password"]').value.trim();
+            const emailEl = document.getElementById('login-email');
+            const passwordEl = document.getElementById('login-password');
+            if (!emailEl || !passwordEl) return;
+            const email = emailEl.value.trim().toLowerCase();
+            const password = passwordEl.value.trim();
             const submitBtn = loginForm.querySelector('button[type="submit"]');
 
             // UI Feedback
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Logging in...';
+            const btnText = submitBtn.querySelector('span');
+            const loader = submitBtn.querySelector('.loader');
+            const genError = document.getElementById('login-general-error');
+
+            if (btnText) btnText.style.display = 'none';
+            if (loader) loader.style.display = 'block';
+            if (genError) genError.style.display = 'none';
             submitBtn.disabled = true;
 
             try {
@@ -1895,7 +2082,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const adminData = await adminRes.json();
 
                     if (adminRes.ok) {
-                        localStorage.setItem('efv_token', adminData.token);
+                        localStorage.setItem('authToken', adminData.token);
                         localStorage.setItem('efv_user', JSON.stringify({
                             name: adminData.name,
                             email: adminData.email,
@@ -1906,8 +2093,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         if (window.updateAdminNavbar) window.updateAdminNavbar();
                         closeAuth();
+                        showToast('Welcome back, Admin!');
                         updateCartUI();
-                        toggleCart(true);
+
+                        // Redirect to dashboard instead of opening cart
+                        setTimeout(() => {
+                            window.location.href = 'profile.html';
+                        }, 1000);
                         return;
                     } else {
                         throw new Error(adminData.message || 'Admin login failed');
@@ -1928,7 +2120,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Success
-                localStorage.setItem('efv_token', data.token);
+                localStorage.setItem('authToken', data.token);
                 localStorage.setItem('efv_user', JSON.stringify({
                     name: data.name,
                     email: data.email,
@@ -1937,25 +2129,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 }));
 
                 closeAuth();
-                updateCartUI(); // Update UI to reflect login
-                toggleCart(true);
+                showToast('Welcome back!');
+                if (typeof updateAuthNavbar === 'function') updateAuthNavbar();
+                updateCartUI();
+
+                // Redirect to dashboard instead of opening cart
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1000);
 
                 // Sync library
                 syncLibraryWithBackend().catch(err => console.error('Background sync failed:', err));
 
-                // Optional: Reload if on profile page or to refresh state
-                if (window.location.pathname.includes('profile.html')) {
-                    window.location.reload();
-                } else if (!window.location.pathname.includes('index.html') && !window.location.pathname.includes('marketplace.html')) {
-                    // Maybe redirect to profile if not on main pages?
-                    window.location.href = 'profile.html';
-                }
-
             } catch (error) {
                 console.error('Login Error:', error);
-                alert(error.message);
+                const genError = document.getElementById('login-general-error');
+                if (genError) {
+                    genError.textContent = error.message;
+                    genError.style.display = 'block';
+                }
             } finally {
-                submitBtn.textContent = originalText;
+                const btnText = submitBtn.querySelector('span');
+                const loader = submitBtn.querySelector('.loader');
+                if (btnText) btnText.style.display = 'block';
+                if (loader) loader.style.display = 'none';
                 submitBtn.disabled = false;
             }
         });
@@ -1964,22 +2161,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if (signupForm) {
         signupForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = signupForm.querySelector('input[type="text"]').value;
-            const email = signupForm.querySelector('input[type="email"]').value;
-            const password = signupForm.querySelector('input[type="password"]').value; // Need password input in HTML if not present, but assuming it is there based on read
+            const nameEl = document.getElementById('signup-name');
+            const emailEl = document.getElementById('signup-email');
+            const phoneEl = document.getElementById('signup-phone');
+            const passwordEl = document.getElementById('signup-password');
+            if (!nameEl || !emailEl || !passwordEl) return;
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const phone = phoneEl ? phoneEl.value.trim() : '';
             const submitBtn = signupForm.querySelector('button[type="submit"]');
 
             // UI Feedback
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Creating Account...';
+            const btnText = submitBtn.querySelector('span');
+            const loader = submitBtn.querySelector('.loader');
+            const genError = document.getElementById('signup-general-error');
+
+            if (btnText) btnText.style.display = 'none';
+            if (loader) loader.style.display = 'block';
+            if (genError) genError.style.display = 'none';
             submitBtn.disabled = true;
 
             try {
-                // API Signup
-                const response = await fetch('http://localhost:5000/api/auth/signup', {
+                // API Signup (Updated to /register with phone)
+                const response = await fetch('http://localhost:5000/api/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password })
+                    body: JSON.stringify({
+                        name: nameEl.value.trim(),
+                        email: emailEl.value.trim(),
+                        phone: phoneEl ? phoneEl.value.trim() : '',
+                        password: passwordEl.value
+                    })
                 });
 
                 const data = await response.json();
@@ -1989,28 +2201,249 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 // Success
-                localStorage.setItem('efv_token', data.token);
+                localStorage.setItem('authToken', data.token);
                 localStorage.setItem('efv_user', JSON.stringify({
+                    _id: data._id,
                     name: data.name,
                     email: data.email,
-                    _id: data._id
+                    role: 'user'
                 }));
 
                 closeAuth();
-                updateCartUI(); // Update UI to reflect signup
-                toggleCart(true);
+                showToast('Account created successfully!');
+                if (typeof updateAuthNavbar === 'function') updateAuthNavbar();
 
-                // Sync library
-                syncLibraryWithBackend().catch(err => console.error('Background sync failed:', err));
+                // Auto-login flow: Redirect to profile for dashboard access
+                setTimeout(() => {
+                    window.location.href = 'profile.html';
+                }, 1500);
 
             } catch (error) {
                 console.error('Signup Error:', error);
-                alert(error.message);
+                const genError = document.getElementById('signup-general-error');
+                if (genError) {
+                    genError.textContent = error.message;
+                    genError.style.display = 'block';
+                }
             } finally {
-                submitBtn.textContent = originalText;
+                const btnText = submitBtn.querySelector('span');
+                const loader = submitBtn.querySelector('.loader');
+                if (btnText) btnText.style.display = 'block';
+                if (loader) loader.style.display = 'none';
                 submitBtn.disabled = false;
             }
         });
+    }
+
+    // --- FORGOT PASSWORD FLOW LOGIC ---
+    const forgotLink = document.querySelector('.forgot-link');
+    const authTabs = document.querySelector('.auth-premium-tabs');
+    const forgotFlow = document.getElementById('forgot-password-flow');
+    const backToLogin = document.getElementById('back-to-login');
+
+    // Forms
+    const forgotEmailForm = document.getElementById('forgot-email-form');
+    const forgotOtpForm = document.getElementById('forgot-otp-form');
+    const forgotResetForm = document.getElementById('forgot-reset-form');
+    const forgotSuccessView = document.getElementById('forgot-success-view');
+
+    let resetSession = {
+        email: '',
+        token: ''
+    };
+
+    const showForgotStep = (step) => {
+        forgotEmailForm.style.display = 'none';
+        forgotOtpForm.style.display = 'none';
+        forgotResetForm.style.display = 'none';
+        forgotSuccessView.style.display = 'none';
+
+        const dots = [1, 2, 3].map(n => document.getElementById(`fp-dot-${n}`));
+        const titles = ['Send Code', 'Verify OTP', 'New Password', 'Done!'];
+        const titleEl = document.getElementById('forgot-flow-title');
+        const backEl = document.getElementById('back-to-login');
+
+        // Hide back button on success
+        if (backEl) backEl.style.display = step === 4 ? 'none' : 'flex';
+        if (titleEl) titleEl.textContent = titles[step - 1] || '';
+
+        // Update dots
+        dots.forEach((dot, i) => {
+            dot?.classList.remove('active', 'done');
+            if (i < step - 1) dot?.classList.add('done');
+            else if (i === step - 1) dot?.classList.add('active');
+        });
+
+        if (step === 1) forgotEmailForm.style.display = 'flex';
+        if (step === 2) forgotOtpForm.style.display = 'flex';
+        if (step === 3) forgotResetForm.style.display = 'flex';
+        if (step === 4) forgotSuccessView.style.display = 'block';
+    };
+
+    if (forgotLink) {
+        forgotLink.onclick = (e) => {
+            e.preventDefault();
+            loginForm.style.display = 'none';
+            signupForm.style.display = 'none';
+            authTabs.style.display = 'none';
+            forgotFlow.style.display = 'block';
+            showForgotStep(1);
+        };
+    }
+
+    if (backToLogin) {
+        backToLogin.onclick = () => {
+            if (forgotFlow) forgotFlow.style.display = 'none';
+            if (authTabs) authTabs.style.display = 'flex';
+            switchTab('login');
+        };
+    }
+
+    const setLoader = (form, isLoading) => {
+        const btn = form.querySelector('button[type="submit"]');
+        if (!btn) return;
+        const text = btn.querySelector('span');
+        const loader = btn.querySelector('.loader');
+        btn.disabled = isLoading;
+        if (text) text.style.display = isLoading ? 'none' : 'block';
+        if (loader) loader.style.display = isLoading ? 'block' : 'none';
+    };
+
+    // Step 1: Send OTP
+    if (forgotEmailForm) {
+        forgotEmailForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('forgot-email').value.trim();
+            const errorEl = document.getElementById('forgot-email-error');
+            errorEl.style.display = 'none';
+            setLoader(forgotEmailForm, true);
+
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    resetSession.email = email;
+                    showForgotStep(2);
+                    showToast('OTP sent to your email');
+                } else {
+                    errorEl.textContent = data.message;
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Connection error. Try again.';
+                errorEl.style.display = 'block';
+            } finally {
+                setLoader(forgotEmailForm, false);
+            }
+        };
+    }
+
+    // Step 2: Verify OTP
+    if (forgotOtpForm) {
+        forgotOtpForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const otp = document.getElementById('forgot-otp').value.trim();
+            const errorEl = document.getElementById('forgot-otp-error');
+            errorEl.style.display = 'none';
+            setLoader(forgotOtpForm, true);
+
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/verify-reset-otp', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: resetSession.email, otp })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    resetSession.token = data.resetToken;
+                    showForgotStep(3);
+                } else {
+                    errorEl.textContent = data.message;
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Verification failed. Try again.';
+                errorEl.style.display = 'block';
+            } finally {
+                setLoader(forgotOtpForm, false);
+            }
+        };
+    }
+
+    // Step 3: Reset Password
+    if (forgotResetForm) {
+        forgotResetForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('forgot-new-password').value;
+            const confirm = document.getElementById('forgot-confirm-password').value;
+            const errorEl = document.getElementById('forgot-reset-error');
+            errorEl.style.display = 'none';
+
+            if (pass.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters.';
+                errorEl.style.display = 'block';
+                return;
+            }
+            if (pass !== confirm) {
+                errorEl.textContent = 'Passwords do not match.';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            setLoader(forgotResetForm, true);
+            try {
+                const res = await fetch('http://localhost:5000/api/auth/reset-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ resetToken: resetSession.token, newPassword: pass })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    showForgotStep(4);
+                } else {
+                    errorEl.textContent = data.message;
+                    errorEl.style.display = 'block';
+                }
+            } catch (err) {
+                errorEl.textContent = 'Reset failed. Try again.';
+                errorEl.style.display = 'block';
+            } finally {
+                setLoader(forgotResetForm, false);
+            }
+        };
+    }
+
+    const finishBtn = document.getElementById('finish-reset-btn');
+    if (finishBtn) {
+        finishBtn.onclick = () => {
+            if (forgotFlow) forgotFlow.style.display = 'none';
+            if (authTabs) authTabs.style.display = 'flex';
+            switchTab('login');
+        };
+    }
+
+    // Resend OTP
+    const resendBtn = document.getElementById('resend-otp-btn');
+    if (resendBtn) {
+        resendBtn.onclick = async (e) => {
+            e.preventDefault();
+            showToast('Requesting new code...');
+            try {
+                await fetch('http://localhost:5000/api/auth/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: resetSession.email })
+                });
+                showToast('New code sent');
+            } catch (err) { }
+        };
     }
 
     if (logoutBtn) {
@@ -2024,7 +2457,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             sessionStorage.removeItem('adminLoggedIn');
             localStorage.removeItem('efv_user');
-            localStorage.removeItem('efv_token'); // Clear auth token
+            localStorage.removeItem('authToken'); // Clear auth token
             localStorage.removeItem('efv_cart'); // Clear cart on logout for demo isolation
 
             if (window.updateAdminNavbar) window.updateAdminNavbar();
@@ -2040,20 +2473,140 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Initial State Check
-    if (localStorage.getItem('efv_user') || sessionStorage.getItem('adminLoggedIn') === 'true') {
-        // Fix for "Guest User" names in stored profiles
-        const storedUser = JSON.parse(localStorage.getItem('efv_user'));
-        if (storedUser && storedUser.name && (storedUser.name.toLowerCase() === 'guest user' || storedUser.name.toUpperCase() === 'GUEST USER' || storedUser.name === 'John Doe')) {
-            const nameFromEmail = storedUser.email.split('@')[0].charAt(0).toUpperCase() + storedUser.email.split('@')[0].slice(1);
-            storedUser.name = nameFromEmail;
-            localStorage.setItem('efv_user', JSON.stringify(storedUser));
+    // --- AUTO LOGIN & NAVBAR SYNC ---
+    // --- PREMIUM AUTO LOGIN & NAVBAR SYNC ---
+    window.updateAuthNavbar = function () {
+        const user = JSON.parse(localStorage.getItem('efv_user'));
+        const navActions = document.querySelector('.nav-actions');
+        if (!navActions) return;
+
+        let userMenu = document.getElementById('nav-user-menu');
+        let loginBtn = document.getElementById('nav-login-btn');
+
+        if (user) {
+            if (loginBtn) loginBtn.remove();
+            if (!userMenu) {
+                userMenu = document.createElement('div');
+                userMenu.id = 'nav-user-menu';
+                userMenu.className = 'user-menu-container';
+                userMenu.style.marginLeft = '10px';
+                userMenu.innerHTML = `
+                    <button class="btn btn-outline small" id="user-menu-trigger" style="display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-user-circle" style="font-size: 1.2rem;"></i> 
+                        <span>${user.name.split(' ')[0]}</span> 
+                        <i class="fas fa-chevron-down" style="font-size: 0.7rem; opacity: 0.7;"></i>
+                    </button>
+                    <div class="user-dropdown" id="user-dropdown">
+                        <div style="padding: 10px 15px; font-size: 0.75rem; color: var(--gold-energy); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.8;">Account</div>
+                        <a href="profile.html?tab=dashboard" class="dropdown-item"><i class="fas fa-th-large"></i> Dashboard</a>
+                        <a href="profile.html?tab=orders" class="dropdown-item"><i class="fas fa-shopping-bag"></i> My Orders</a>
+                        <a href="profile.html?tab=library" class="dropdown-item"><i class="fas fa-book-open"></i> My Library</a>
+                        <div class="dropdown-divider"></div>
+                        <a href="#" class="dropdown-item" id="nav-logout-btn" style="color: #ff4d4d;"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                `;
+                navActions.appendChild(userMenu);
+
+                // Dropdown Trigger
+                const trigger = document.getElementById('user-menu-trigger');
+                const dropdown = document.getElementById('user-dropdown');
+
+                trigger.onclick = (e) => {
+                    e.stopPropagation();
+                    dropdown.classList.toggle('active');
+                };
+
+                // Logout logic injection
+                const logout = document.getElementById('nav-logout-btn');
+                logout.onclick = (e) => {
+                    e.preventDefault();
+                    logoutUser();
+                };
+            } else {
+                userMenu.querySelector('span').textContent = user.name.split(' ')[0];
+            }
+        } else {
+            if (userMenu) userMenu.remove();
+            if (!loginBtn) {
+                loginBtn = document.createElement('button');
+                loginBtn.id = 'nav-login-btn';
+                loginBtn.className = 'btn btn-gold small';
+                loginBtn.style.marginLeft = '10px';
+                loginBtn.textContent = 'Login';
+                loginBtn.onclick = () => openAuthModal('login');
+                navActions.appendChild(loginBtn);
+            }
         }
-        // toggleUserProfile(true); // Removed to prevent loop
-        syncLibraryWithBackend(); // Initial sync
+    };
+
+    function logoutUser() {
+        if (window.currentAudio) {
+            window.currentAudio.pause();
+            window.currentAudio = null;
+        }
+        if (typeof deactivateSecurityShield === 'function') deactivateSecurityShield();
+
+        sessionStorage.removeItem('adminLoggedIn');
+        localStorage.removeItem('efv_user');
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('efv_cart');
+
+        if (window.updateAdminNavbar) window.updateAdminNavbar();
+
+        showToast('Logged out successfully');
+
+        // Update UI
+        updateAuthNavbar();
+        updateCartUI();
+        if (typeof toggleUserProfile === 'function') toggleUserProfile(false);
+
+        // Redirect to home if on profile
+        if (window.location.pathname.includes('profile.html')) {
+            window.location.href = 'index.html';
+        }
     }
 
+    // Auto-login on load
+    async function checkAutoLogin() {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            updateAuthNavbar();
+            return;
+        }
+
+        try {
+            const res = await fetch('http://localhost:5000/api/users/profile', {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                const userData = await res.json();
+                localStorage.setItem('efv_user', JSON.stringify(userData));
+                updateAuthNavbar();
+                // If on profile page, maybe trigger local state update
+                if (typeof initializeDashboard === 'function') {
+                    initializeDashboard(userData);
+                }
+            } else {
+                // Token invalid
+                localStorage.removeItem('authToken');
+                // localStorage.removeItem('efv_user'); // Don't clear user immediately to prevent blink? Or do it for security.
+                updateAuthNavbar();
+            }
+        } catch (e) {
+            console.error('Auto-login check failed', e);
+            updateAuthNavbar();
+        }
+    }
+
+    checkAutoLogin();
     updateCartUI();
+
+    // Forced Library Sync on load if token exists
+    if (localStorage.getItem('authToken')) {
+        setTimeout(() => {
+            syncLibraryWithBackend().catch(e => console.error('Early sync failed:', e));
+        }, 100);
+    }
 });
 
 function showResumeOption(title, progressLabel, onResume, onRestart) {

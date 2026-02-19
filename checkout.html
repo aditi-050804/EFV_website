@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout | EFV™</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Outfit:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --gold-energy: #FFD369;
+            --dark-bg: #0A0A0B;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background: var(--dark-bg);
+            color: white;
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        .checkout-container {
+            max-width: 1200px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 992px) {
+            .checkout-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .checkout-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+        }
+
+        h1,
+        h2,
+        h3 {
+            font-family: 'Cinzel', serif;
+            color: var(--gold-energy);
+            margin-bottom: 25px;
+        }
+
+        /* Order Summary Styles */
+        .order-items {
+            margin-bottom: 30px;
+        }
+
+        .checkout-item {
+            display: flex;
+            gap: 20px;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .checkout-item:last-child {
+            border-bottom: none;
+        }
+
+        .checkout-item-img {
+            width: 80px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--gold-energy);
+        }
+
+        .checkout-item-info {
+            flex: 1;
+        }
+
+        .checkout-item-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .checkout-item-meta {
+            font-size: 0.9rem;
+            opacity: 0.6;
+            margin-bottom: 10px;
+        }
+
+        .checkout-item-price {
+            color: var(--gold-energy);
+            font-weight: 700;
+        }
+
+        .checkout-total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .checkout-total-row.grand-total {
+            border-top: 1px solid var(--gold-energy);
+            margin-top: 10px;
+            font-size: 1.5rem;
+            color: var(--gold-energy);
+            font-weight: 800;
+        }
+
+        /* Form Styles */
+        .address-form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.8;
+        }
+
+        input,
+        select {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--gold-energy);
+        }
+
+        .btn-checkout {
+            background: var(--gold-energy);
+            color: black;
+            border: none;
+            padding: 18px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 211, 105, 0.3);
+        }
+
+        .btn-checkout:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .back-link {
+            color: white;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .back-link:hover {
+            opacity: 1;
+        }
+
+        /* Toast notifications */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--gold-energy);
+            color: black;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: 700;
+            z-index: 10000;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .toast.active {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+
+    <nav class="navbar" style="background: rgba(10, 10, 11, 0.9);">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <img src="img/AISA.svg" alt="EFV">
+                <span>EFV<sup>TM</sup></span>
+            </a>
+            <div style="flex: 1;"></div>
+            <a href="marketplace.html"
+                style="color:var(--gold-energy); text-decoration:none; font-family:'Cinzel'; font-weight:700; display: flex; align-items: center; gap: 8px; text-shadow: 0 0 10px rgba(255, 211, 105, 0.5); transition: all 0.3s;">
+                <i class="fas fa-arrow-left"></i> GO TO MARKETPLACE
+            </a>
+        </div>
+    </nav>
+
+    <div class="checkout-container">
+        <!-- Left Side: Shipping Address -->
+        <div class="checkout-card">
+            <a href="marketplace.html" class="back-link"><i class="fas fa-arrow-left"></i> Back to Shopping</a>
+            <h2>Shipping Details</h2>
+            <form id="shipping-form" class="address-form">
+                <div class="form-group full-width">
+                    <label>Full Name</label>
+                    <input type="text" id="ship-name" placeholder="Gurumukh P Ahuja" required>
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" id="ship-phone" placeholder="10-digit number" maxlength="10" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="ship-email" placeholder="email@example.com" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>House / Flat / Street</label>
+                    <input type="text" id="ship-address" placeholder="Bunglow No, Street Name" required>
+                </div>
+                <div class="form-group full-width">
+                    <label>Area / Landmark</label>
+                    <input type="text" id="ship-area" placeholder="Near Meta Center, Opposite..." required>
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" id="ship-city" placeholder="e.g. Mumbai" required>
+                </div>
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" id="ship-state" placeholder="e.g. Maharashtra" required>
+                </div>
+                <div class="form-group">
+                    <label>Pincode</label>
+                    <input type="text" id="ship-pincode" placeholder="6-digit code" maxlength="6" required>
+                </div>
+                <div class="form-group">
+                    <label>Country</label>
+                    <select id="ship-country" required>
+                        <option value="India" selected>India</option>
+                        <option value="USA">USA</option>
+                        <option value="UK">UK</option>
+                        <option value="Canada">Canada</option>
+                        <option value="UAE">UAE</option>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+        <!-- Right Side: Order Summary -->
+        <div class="checkout-card">
+            <h2>Order Summary</h2>
+            <div id="checkout-items-list" class="order-items">
+                <!-- Items injected by JS -->
+            </div>
+
+            <div class="checkout-summary">
+                <div class="checkout-total-row">
+                    <span>Subtotal</span>
+                    <span id="summary-subtotal">₹0.00</span>
+                </div>
+                <div class="checkout-total-row">
+                    <span>Shipping</span>
+                    <span id="summary-shipping">FREE</span>
+                </div>
+                <div class="checkout-total-row grand-total">
+                    <span>Total</span>
+                    <span id="summary-total">₹0.00</span>
+                </div>
+            </div>
+
+            <button id="place-order-btn" class="btn-checkout">
+                PLACE ORDER <i class="fas fa-arrow-right"></i>
+            </button>
+            <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; opacity: 0.5;">
+                Secure payment via Razorpay SSL encrypted.
+            </p>
+        </div>
+    </div>
+
+    <div id="checkout-toast" class="toast">Order Created Successfully!</div>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="js/checkout.js"></script>
+</body>
+
+</html>
